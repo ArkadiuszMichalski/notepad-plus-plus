@@ -40,12 +40,7 @@ jobs:
         $files_modified = @(git diff --name-only HEAD~1)
         $files_notmached = @($files_modified | Where-Object {$_ -notmatch "\.(xml|$files_nowork)$|$folders_onejob"})
 
-        echo $commit_message
-        echo $files_modified
-        echo $files_notmached
-
         if ($allowMaster -or $isPull) {
-
             if ($commit_message -match "\[force all\]") {
               Write-Output "Run standard jobs"
             }
@@ -62,7 +57,6 @@ jobs:
                 else {
                     Write-Output "XML validation mode`n"
                     if (@($files_modified | Where-Object {$_ -match $folders_onejob}).length -eq 0) {
-                        $env:Path = "$env:python_dir;$env:python_dir\Scripts;" + $env:Path
                         python -m pip install requests rfc3987 pywin32 lxml
                         python PowerEditor\Test\xmlValidator\validator_xml.py
                         if ($LastExitCode -eq 0) {
@@ -93,11 +87,11 @@ jobs:
   build_windows:
 
     runs-on: windows-latest
+    needs: before_build
+    if: needs.before_build.outputs.result == '' || needs.before_build.outputs.result == 'ONEJOB'
     strategy:
       fail-fast: false
-      matrix:
-        build_configuration: [Release, Debug]
-        build_platform: [x64, Win32, ARM64]
+      matrix: ${{ fromJSON(needs.before_build.outputs.matrix) }}
 
     steps:
     - name: Checkout repo
@@ -185,6 +179,8 @@ jobs:
   # build_windows_clang:
 
     # runs-on: windows-latest
+    #needs: before_build
+    #if: needs.before_build.outputs.result == ''
     # strategy:
       # matrix:
         # build_configuration: [Release]
@@ -212,6 +208,8 @@ jobs:
   build_windows_cmake:
 
     runs-on: windows-latest
+    needs: before_build
+    if: needs.before_build.outputs.result == ''
     strategy:
       matrix:
         include:
@@ -264,6 +262,8 @@ jobs:
   build_windows_msys2:
 
     runs-on: windows-latest
+    needs: before_build
+    if: needs.before_build.outputs.result == ''
     strategy:
       fail-fast: false
       matrix:
