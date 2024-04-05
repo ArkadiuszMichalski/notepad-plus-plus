@@ -39,9 +39,7 @@ jobs:
 
         $files_modified = @(git diff --name-only HEAD~1)
         $files_notmached = @($files_modified | Where-Object {$_ -notmatch "\.(xml|$files_nowork)$|$folders_onejob"})
-        echo $commit_message
-        echo $files_modified
-        echo $files_notmached
+
         if ($allowMaster -or $isPull) {
             if ($commit_message -match "\[force all\]") {
               Write-Output "Run standard jobs"
