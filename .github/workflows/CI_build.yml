@@ -29,7 +29,7 @@ jobs:
         $folders_nowork = "\.github/ISSUE_TEMPLATE"
         $files_nowork = "md|txt|log|ini"
         $files_needwork = "CMakeLists\.txt"
- 
+
         $matrix_all = 'matrix={"build_configuration": ["Release", "Debug"], "build_platform": ["x64", "Win32", "ARM64"]}'
         $matrix_onejob = 'matrix={"build_configuration": ["Debug"], "build_platform": ["Win32"]}'
         Write-Output $matrix_all >> $env:GITHUB_OUTPUT
