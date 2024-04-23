@@ -95,7 +95,7 @@ jobs:
         }
     
     - name: Restore Python cache
-      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.result == 'XML' 
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.result == 'XML'
       uses: actions/cache/restore@v4
       id: cache
       with:
