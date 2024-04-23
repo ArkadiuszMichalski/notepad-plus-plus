@@ -200,7 +200,7 @@ jobs:
           name: Notepad++.MSVC.${{ matrix.build_platform}}.${{ matrix.build_configuration}}
           path: PowerEditor\visual.net\${{ matrix.build_configuration}}\Notepad++.exe
 
-    - name: (cache) Restore Python modules
+    - name: (cache) Restore Python modules for Win32 / Debug 
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug' && env.PYTHON_ALLOW_CACHE == 'true'
       uses: actions/cache/restore@v4
       id: cache
