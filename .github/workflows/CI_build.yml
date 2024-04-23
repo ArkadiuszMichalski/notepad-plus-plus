@@ -91,7 +91,7 @@ jobs:
           $rfc3987 = (Invoke-RestMethod https://pypi.org/pypi/rfc3987/json).info.version
           $pywin32 = (Invoke-RestMethod https://pypi.org/pypi/pywin32/json).info.version
           $lxml = (Invoke-RestMethod https://pypi.org/pypi/lxml/json).info.version
-          $key = python_$python-rfc3987_$rfc3987-pywin32_$pywin32-lxml_$lxml
+          $key = "python_$python-rfc3987_$rfc3987-pywin32_$pywin32-lxml_$lxml"
           Write-Output "python=$key" >> $env:GITHUB_OUTPUT
           $needPythonCache = ((Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content -notmatch "${{ runner.os }}-$key")
           Write-Output "needPythonCache=$needPythonCache" >> $env:GITHUB_OUTPUT
