@@ -95,11 +95,6 @@ jobs:
           Write-Output "python=$key" >> $env:GITHUB_OUTPUT
           $needPythonCache = ((Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content -notmatch "${{ runner.os }}-$key")
           Write-Output "needPythonCache=$needPythonCache" >> $env:GITHUB_OUTPUT
-         
-          Write-Output (Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content
-          Write-Output "${{ runner.os }}-$key"
-          Write-Output $needPythonCache
-          
         }
     
     - name: Restore Python cache
@@ -112,10 +107,9 @@ jobs:
     
     - name: Install Python modules
       # && jak sprawdzić czy istnieje cache o danym key?
-      if: env.PYTHON_ALLOW_CACHE == 'true'
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needPythonCache == 'true'
       run: |
-        Write-Output ${{ steps.filter.outputs.needPythonCache }}
-        #python -m pip install --target D:\.cache\python requests rfc3987 pywin32 lxml
+        python -m pip install --target D:\.cache\python requests rfc3987 pywin32 lxml
 
     - name: XML validation
       if: steps.filter.outputs.result == 'XML'
@@ -132,7 +126,7 @@ jobs:
         }
 
     - name: Save Python cache
-      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.cache.outputs.cache-hit != 'true' 
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needPythonCache == 'true'
       uses: actions/cache/save@v4
       with:
         path: 'D:\.cache\python'
