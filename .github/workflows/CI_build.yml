@@ -1,6 +1,10 @@
 name: CI_build
 
 on: [push, pull_request]
+env:
+  PYTHON_ALLOW_CACHE: true
+  MSYS2_ALLOW_UPDATE: true 
+  MSYS2_ALLOW_CACHE: true
 
 jobs:
   before_build:
@@ -9,6 +13,8 @@ jobs:
     outputs:
       result: ${{ steps.filter.outputs.result }}
       matrix: ${{ steps.filter.outputs.matrix }}
+      title: ${{ steps.filter.outputs.title }}
+      python: ${{ steps.filter.outputs.python }}
 
     steps:
     - name: Checkout repo
@@ -40,6 +46,7 @@ jobs:
         }
 
         $commit_title = ($commit_message -split "[\r\n]+")[0]
+        Write-Output "title=$commit_title" >> $env:GITHUB_OUTPUT
         $files_modified = @(git diff --name-only HEAD~1)
         $files_needwork_all = @($files_modified | Where-Object {$_ -notmatch "\.(xml|$files_nowork)$|$folders_nowork|$folders_onejob" -or $_ -match "($files_needwork)$"})
 
@@ -58,18 +65,9 @@ jobs:
                     Write-Output "result=OK" >> $env:GITHUB_OUTPUT
                 }
                 else {
-                    Write-Output "XML validation mode`n"
+                    Write-Output "Run only XML validation step"
                     if (@($files_modified | Where-Object {$_ -match $folders_onejob}).length -eq 0) {
-                        python -m pip install requests rfc3987 pywin32 lxml
-                        python PowerEditor\Test\xmlValidator\validator_xml.py
-                        if ($LastExitCode -eq 0) {
-                            Write-Output "`nAll XML files are valid.`n"
-                            Write-Output "result=OK" >> $env:GITHUB_OUTPUT
-                        }
-                        else {
-                            Write-Output "`nSome XML files are invalid.`n"
-                            $host.SetShouldExit($LastExitCode)
-                        }
+                        Write-Output "result=XML" >> $env:GITHUB_OUTPUT
                     }
                     else {
                       Write-Output "Run only one Win32/Debug job"
@@ -87,11 +85,54 @@ jobs:
           Write-Output "Run standard jobs"
         }
 
+        if ($Env:PYTHON_ALLOW_CACHE -eq "true"){
+          $python = ((python -V) -split " ")[1]
+          $requests = (Invoke-RestMethod https://pypi.org/pypi/requests/json).info.version
+          $rfc3987 = (Invoke-RestMethod https://pypi.org/pypi/rfc3987/json).info.version
+          $pywin32 = (Invoke-RestMethod https://pypi.org/pypi/pywin32/json).info.version
+          $lxml = (Invoke-RestMethod https://pypi.org/pypi/lxml/json).info.version
+          Write-Output "python=python_$python-rfc3987_$rfc3987-pywin32_$pywin32-lxml_$lxml" >> $env:GITHUB_OUTPUT
+        }
+    
+    - name: Restore Python cache
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.result == 'XML'
+      uses: actions/cache/restore@v4
+      id: cache
+      with:
+        path: 'D:\.cache\python'
+        key: ${{ runner.os }}-${{ steps.filter.outputs.python }}   
+    
+    - name: Install Python modules
+      # && jak sprawdzić czy istnieje cache o danym key?
+      if: env.PYTHON_ALLOW_CACHE == 'true'
+      run: python -m pip install --target D:\.cache\python requests rfc3987 pywin32 lxml
+
+    - name: XML validation
+      if: steps.filter.outputs.result == 'XML'
+      run: |
+        $Env:PYTHONPATH="D:\.cache\python"
+        python PowerEditor\Test\xmlValidator\validator_xml.py
+        if ($LastExitCode -eq 0) {
+            Write-Output "`nAll XML files are valid.`n"
+
+        }
+        else {
+            Write-Output "`nSome XML files are invalid.`n"
+            $host.SetShouldExit($LastExitCode)
+        }
+
+    - name: Save Python cache
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.cache.outputs.cache-hit != 'true' 
+      uses: actions/cache/save@v4
+      with:
+        path: 'D:\.cache\python'
+        key: ${{ runner.os }}-${{ steps.filter.outputs.python }} 
+
   build_windows:
 
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == '' || needs.before_build.outputs.result == 'ONEJOB'
+    if: (needs.before_build.outputs.result == '' || needs.before_build.outputs.result == 'ONEJOB') && 0
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.before_build.outputs.matrix) }}
@@ -212,7 +253,7 @@ jobs:
 
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == ''
+    if: needs.before_build.outputs.result == '' && 0
     strategy:
       matrix:
         include:
@@ -266,7 +307,7 @@ jobs:
 
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == ''
+    if: needs.before_build.outputs.result == '' && 0
     strategy:
       fail-fast: false
       matrix:
