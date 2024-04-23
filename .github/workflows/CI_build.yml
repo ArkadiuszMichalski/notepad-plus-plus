@@ -91,9 +91,9 @@ jobs:
           $rfc3987 = (Invoke-RestMethod https://pypi.org/pypi/rfc3987/json).info.version
           $pywin32 = (Invoke-RestMethod https://pypi.org/pypi/pywin32/json).info.version
           $lxml = (Invoke-RestMethod https://pypi.org/pypi/lxml/json).info.version
-          $key = "python_$python-rfc3987_$rfc3987-pywin32_$pywin32-lxml_$lxml"
+          $key = "${{ runner.os }}-python_$python-rfc3987_$rfc3987-pywin32_$pywin32-lxml_$lxml"
           Write-Output "python=$key" >> $env:GITHUB_OUTPUT
-          $needPythonCache = ((Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content -notmatch "${{ runner.os }}-$key")
+          $needPythonCache = ((Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content -notmatch "$key")
           Write-Output "needPythonCache=$needPythonCache" >> $env:GITHUB_OUTPUT
         }
     
@@ -103,7 +103,7 @@ jobs:
       id: cache
       with:
         path: 'D:\.cache\python'
-        key: ${{ runner.os }}-${{ steps.filter.outputs.python }}   
+        key: ${{ steps.filter.outputs.python }}   
     
     - name: (cache) Install Python modules
       if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needPythonCache == 'true'
@@ -115,7 +115,7 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: 'D:\.cache\python'
-        key: ${{ runner.os }}-${{ steps.filter.outputs.python }} 
+        key: ${{ steps.filter.outputs.python }} 
 
     - name: XML validation
       if: steps.filter.outputs.result == 'XML'
