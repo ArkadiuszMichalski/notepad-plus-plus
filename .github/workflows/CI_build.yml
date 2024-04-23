@@ -95,6 +95,11 @@ jobs:
           Write-Output "python=$key" >> $env:GITHUB_OUTPUT
           $needPythonCache = ((Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content -notmatch "${{ runner.os }}-$key")
           Write-Output "needPythonCache=$needPythonCache" >> $env:GITHUB_OUTPUT
+         
+          Write-Output (Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content
+          Write-Output "${{ runner.os }}-$key"
+          Write-Output $needPythonCache
+          
         }
     
     - name: Restore Python cache
