@@ -97,7 +97,7 @@ jobs:
           Write-Output "needPythonCache=$needPythonCache" >> $env:GITHUB_OUTPUT
         }
     
-    - name: Restore Python cache
+    - name: Restore Python modules from cache
       if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.result == 'XML' 
       uses: actions/cache/restore@v4
       id: cache
@@ -105,16 +105,27 @@ jobs:
         path: 'D:\.cache\python'
         key: ${{ runner.os }}-${{ steps.filter.outputs.python }}   
     
-    - name: Install Python modules
-      # && jak sprawdzić czy istnieje cache o danym key?
+    - name: Install Python modules for cache
       if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needPythonCache == 'true'
       run: |
         python -m pip install --target D:\.cache\python requests rfc3987 pywin32 lxml
+        
+    - name: Save Python modules to cache
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needPythonCache == 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: 'D:\.cache\python'
+        key: ${{ runner.os }}-${{ steps.filter.outputs.python }} 
 
     - name: XML validation
       if: steps.filter.outputs.result == 'XML'
       run: |
-        $Env:PYTHONPATH="D:\.cache\python"
+        if ($Env:PYTHON_ALLOW_CACHE -eq "true") {
+          $Env:PYTHONPATH="D:\.cache\python"
+        }
+        else {
+          python -m pip install requests rfc3987 pywin32 lxml
+        }
         python PowerEditor\Test\xmlValidator\validator_xml.py
         if ($LastExitCode -eq 0) {
             Write-Output "`nAll XML files are valid.`n"
@@ -124,13 +135,6 @@ jobs:
             Write-Output "`nSome XML files are invalid.`n"
             $host.SetShouldExit($LastExitCode)
         }
-
-    - name: Save Python cache
-      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needPythonCache == 'true'
-      uses: actions/cache/save@v4
-      with:
-        path: 'D:\.cache\python'
-        key: ${{ runner.os }}-${{ steps.filter.outputs.python }} 
 
   build_windows:
 
