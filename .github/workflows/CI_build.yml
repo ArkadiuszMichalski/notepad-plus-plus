@@ -95,8 +95,8 @@ jobs:
           $lxml = (Invoke-RestMethod https://pypi.org/pypi/lxml/json).info.version
           $key = "${{ runner.os }}-python_$python-rfc3987_$rfc3987-pywin32_$pywin32-lxml_$lxml"
           Write-Output "python=$key" >> $env:GITHUB_OUTPUT
-          $needPythonCache = ((Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content -notmatch "$key")
-          Write-Output "needPythonCache=$needPythonCache" >> $env:GITHUB_OUTPUT
+          $needSavePythonCache = ((Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content -notmatch "$key")
+          Write-Output "needSavePythonCache=$needSavePythonCache" >> $env:GITHUB_OUTPUT
         }
     
     - name: (cache) Restore Python modules
@@ -108,12 +108,12 @@ jobs:
         key: ${{ steps.filter.outputs.python }}   
     
     - name: (cache) Install Python modules
-      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needPythonCache == 'true'
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needSavePythonCache == 'true'
       run: |
         python -m pip install --target D:\.cache\python requests rfc3987 pywin32 lxml
         
     - name: (cache) Save Python modules
-      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needPythonCache == 'true' && github.event_name == 'push'
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needSavePythonCache == 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
       with:
         path: 'D:\.cache\python'
