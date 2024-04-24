@@ -382,7 +382,7 @@ jobs:
         if ($Env:MSYS2_SCILEX_ALLOW_CACHE -eq "true") {        
           $gcc_num = ((gcc --version) | select-object -first 1) | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
           $make_num = (mingw32-make --version) | select-object -first 1 -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
-          $hash = ${{ hashFiles('lexilla', 'scintilla', PowerEditor\gcc) }}
+          $hash = ${{ hashFiles('lexilla', 'scintilla', PowerEditor/gcc) }}
         
           Write-Output $gcc_num
           Write-Output $make_num
