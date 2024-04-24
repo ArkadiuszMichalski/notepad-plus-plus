@@ -3,9 +3,9 @@ name: CI_build
 on: [push, pull_request]
 env:
   PYTHON_ALLOW_CACHE: true
+  SCILEX_MSYS2_ALLOW_CACHE: true
   MSYS2_ALLOW_UPDATE: true 
-  MSYS2_SCILEX_ALLOW_CACHE: true
- 
+  
 jobs: 
   before_build: 
   
@@ -376,13 +376,13 @@ jobs:
         }
 
         if ($commit_title -match "\[force noscilexcache\]") {
-          $env:MSYS2_SCILEX_ALLOW_CACHE = "false"
-          Write-Output "MSYS2_SCILEX_ALLOW_CACHE=false" >> $env:GITHUB_ENV
+          $env:SCILEX_MSYS2_ALLOW_CACHE = "false"
+          Write-Output "SCILEX_MSYS2_ALLOW_CACHE=false" >> $env:GITHUB_ENV
         }
-        if ($Env:MSYS2_SCILEX_ALLOW_CACHE -eq "true") {        
+        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true") {        
           $gcc_num = ((gcc --version) | select-object -first 1) | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
           $make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
-          $hash = "${{ hashFiles('lexilla', 'scintilla', 'PowerEditor\gcc') }}"
+          $hash = "${{ hashFiles('lexilla', 'scintilla', 'PowerEditor\gcc', 'boostregex\nppSpecifics_mingw.mak') }}"
           $key = "${{ runner.os }}-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-SCILEX_$hash"
         
           Write-Output $gcc_num
@@ -393,11 +393,30 @@ jobs:
           #Write-Output "key=$key" >> $env:GITHUB_OUTPUT
         }
 
-
-
-
-
-
+    - name: (cache) Lookup SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
+      uses: actions/cache/restore@v4
+      id: cache-lookup
+      with:
+        path: |
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build'
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build'
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a'
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a' 
+        key: ${{ steps.msys2.outputs.key }}   
+        lookup-only: true
+        
+    - name: (cache) Restore SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build'
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build'
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a'
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a' 
+        key: ${{ steps.msys2.outputs.key }}
+        
     - name: Make n++ exe
       working-directory: .\
       run: |
@@ -422,3 +441,14 @@ jobs:
       with:
           name: Notepad++.GCC.${{ matrix.build_platform}}.${{ matrix.build_configuration}}
           path: bin.${{ matrix.build_platform}}-debug\notepad++.exe
+
+    - name: (cache) Save SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build'
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build'
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a'
+          'PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a' 
+        key: ${{ steps.msys2.outputs.key }}
