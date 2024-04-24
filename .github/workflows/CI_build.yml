@@ -87,7 +87,7 @@ jobs:
           Write-Output "Run standard jobs"
         }
 
-        if ($commit_title -match "\[force nocachepython)\]") {
+        if ($commit_title -match "\[force nocachepython\]") {
           $env:PYTHON_ALLOW_CACHE = "false"
           Write-Output "PYTHON_ALLOW_CACHE=false" >> $env:GITHUB_ENV
         }
@@ -211,7 +211,7 @@ jobs:
           path: PowerEditor\visual.net\${{ matrix.build_configuration}}\Notepad++.exe
 
     - name: (cache) Restore Python modules for Win32 / Debug 
-      if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug' && env.PYTHON_ALLOW_CACHE == 'true'
+      if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug' && env.PYTHON_ALLOW_CACHE == 'true' && ${{ !contains(needs.before_build.outputs.title, '[force nocachepython]') }}
       uses: actions/cache/restore@v4
       id: cache
       with:
@@ -222,7 +222,7 @@ jobs:
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug'
       working-directory: .\
       run: |
-           if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and (Test-Path -Path "D:\.cache\python")) {
+           if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and && ${{ !contains(needs.before_build.outputs.title, '[force nocachepython]') }} -and (Test-Path -Path "D:\.cache\python")) {
              $Env:PYTHONPATH="D:\.cache\python"
            }
            else {
