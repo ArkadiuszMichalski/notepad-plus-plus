@@ -101,7 +101,7 @@ jobs:
 
     - name: (cache) Check Python modules
       if: env.PYTHON_ALLOW_CACHE == 'true'
-      uses: actions/cache/cache@v4
+      uses: actions/cache@v4
       id: cache-check
       with:
         path: 'D:\.cache\python'
