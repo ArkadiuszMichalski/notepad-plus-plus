@@ -130,7 +130,7 @@ jobs:
     - name: XML validation
       if: steps.filter.outputs.result == 'XML'
       run: |
-        echo ${{ steps.cache-check.outputs }}
+        echo ${{ toJson(steps.cache-check.outputs) }}
         Exit
         if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and (Test-Path -Path "D:\.cache\python")) {
           $Env:PYTHONPATH="D:\.cache\python"
