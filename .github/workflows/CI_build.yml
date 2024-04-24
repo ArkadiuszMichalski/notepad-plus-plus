@@ -4,7 +4,7 @@ on: [push, pull_request]
 env:
   PYTHON_ALLOW_CACHE: true
   MSYS2_ALLOW_UPDATE: true 
-  MSYS2_ALLOW_CACHE: true
+  MSYS2_SCILEX_ALLOW_CACHE: true
  
 jobs: 
   before_build: 
@@ -359,31 +359,53 @@ jobs:
            $newContent | Set-Content -Path 'resource.h'
 
     - name: Setup MSYS2
+      id: msys2
       run: |
-        Write-host "${{ matrix.build_platform }}"
-        Write-host "${{ matrix.build_configuration }}"
         $Env:Path = 'C:\msys64\usr\bin' + [IO.Path]::PathSeparator + $Env:Path
         if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:MSYSTEM = 'MINGW32'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:Path = 'C:\msys64\mingw32\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:MSYSTEM = 'MINGW64'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:Path = 'C:\msys64\mingw64\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_configuration == 'Debug'}} ) {$Env:DEBUG = '1'; Write-Output "DEBUG=$Env:DEBUG" >> $env:GITHUB_ENV}
-        bash -lc "pacman --noconfirm -Syuu"
-        bash -lc "pacman --noconfirm -Syuu"
-        if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make"}
-        if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make"}
-        
-        $gcc_num = ((gcc --version) | select-object -first 1) | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
-        Write-Output $gcc_num
+        if ($Env:MSYS2_ALLOW_UPDATE -eq "true") {
+          Write-Output "Update MSYS2 and GCC and MAKE"
+          bash -lc "pacman --noconfirm -Syuu"
+          bash -lc "pacman --noconfirm -Syuu"
+          if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make"}
+          if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make"}
+        }
 
-        Write-Output "Tools version:"
-        Write-Output (((gcc --version) | select-object -first 1) + " " + (gcc -dumpmachine))
-        Write-Output (mingw32-make --version) | select-object -first 1
-        Write-Output (sh --version) | select-object -first 1
+        if ($commit_title -match "\[force noscilexcache\]") {
+          $env:MSYS2_SCILEX_ALLOW_CACHE = "false"
+          Write-Output "MSYS2_SCILEX_ALLOW_CACHE=false" >> $env:GITHUB_ENV
+        }
+        if ($Env:MSYS2_SCILEX_ALLOW_CACHE -eq "true") {        
+          $gcc_num = ((gcc --version) | select-object -first 1) | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
+          $make_num = (mingw32-make --version) | select-object -first 1 -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
+          $hash = ${{ hashFiles('lexilla', 'scintilla', PowerEditor\gcc) }}
+        
+          Write-Output $gcc_num
+          Write-Output $make_num
+          Write-Output $hash
+          
+          #$key = "${{ runner.os }}-python_$python-requests_$requests-rfc3987_$rfc3987-pywin32_$pywin32-lxml_$lxml"
+          #Write-Output "python=$key" >> $env:GITHUB_OUTPUT
+        }
+
+
+
+
+
 
     - name: Make n++ exe
       working-directory: .\
       run: |
+        Write-host "${{ matrix.build_platform }}"
+        Write-host "${{ matrix.build_configuration }}"
+        Write-Output "Tools version:"
+        Write-Output (((gcc --version) | select-object -first 1) + " " + (gcc -dumpmachine))
+        Write-Output (mingw32-make --version) | select-object -first 1
+        Write-Output (sh --version) | select-object -first 1
         #mingw32-make -f PowerEditor\gcc\makefile
 
     - name: Archive artifacts for ${{ matrix.build_platform}} / Release
