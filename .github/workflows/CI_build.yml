@@ -400,6 +400,7 @@ jobs:
       id: cache-lookup
       with:
         path: |
+          PowerEditor\visual.net
           PowerEditor\gcc
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
@@ -409,6 +410,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
+          PowerEditor\visual.net
           PowerEditor\gcc
         key: ${{ steps.msys2.outputs.key }}
         
@@ -442,5 +444,6 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
+          PowerEditor\visual.net
           PowerEditor\gcc
         key: ${{ steps.msys2.outputs.key }}
