@@ -360,6 +360,7 @@ jobs:
 
     - name: Setup MSYS2
       id: msys2
+      working-directory: .\
       run: |
         $Env:Path = 'C:\msys64\usr\bin' + [IO.Path]::PathSeparator + $Env:Path
         if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:MSYSTEM = 'MINGW32'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
