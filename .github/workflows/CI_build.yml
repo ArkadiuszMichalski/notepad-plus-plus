@@ -390,7 +390,7 @@ jobs:
           Write-Output $hash
           Write-Output $key
 
-          #Write-Output "key=$key" >> $env:GITHUB_OUTPUT
+          Write-Output "key=$key" >> $env:GITHUB_OUTPUT
         }
 
     - name: (cache) Lookup SciLex files
