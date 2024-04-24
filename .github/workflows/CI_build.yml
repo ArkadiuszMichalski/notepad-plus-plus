@@ -222,7 +222,7 @@ jobs:
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug'
       working-directory: .\
       run: |
-           if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and && ${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }} -and (Test-Path -Path "D:\.cache\python")) {
+           if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and ${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }} -and (Test-Path -Path "D:\.cache\python")) {
              $Env:PYTHONPATH="D:\.cache\python"
            }
            else {
