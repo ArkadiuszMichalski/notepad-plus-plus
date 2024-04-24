@@ -90,8 +90,8 @@ jobs:
         if ($commit_title -match "\[force nopythoncache\]") {
           $env:PYTHON_ALLOW_CACHE = "false"
           Write-Output "PYTHON_ALLOW_CACHE=false" >> $env:GITHUB_ENV
-        } 
-        if ($Env:PYTHON_ALLOW_CACHE -eq "true") {echo "aaaaaaaaaaaaa"
+        }
+        if ($Env:PYTHON_ALLOW_CACHE -eq "true") {
           $python = ((python -V) -split " ")[1]
           $requests = (Invoke-RestMethod https://pypi.org/pypi/requests/json).info.version
           $rfc3987 = (Invoke-RestMethod https://pypi.org/pypi/rfc3987/json).info.version
@@ -172,8 +172,8 @@ jobs:
            $newContent | Set-Content -Path 'resource.h'
 
     - name: MSBuild of n++ exe
-      working-directory: PowerEditor\visual.net\
-      run: msbuild notepadPlus.sln /m /p:configuration="${{ matrix.build_configuration }}" /p:platform="${{ matrix.build_platform }}" /p:PlatformToolset="v143"
+      #working-directory: PowerEditor\visual.net\
+      #run: msbuild notepadPlus.sln /m /p:configuration="${{ matrix.build_configuration }}" /p:platform="${{ matrix.build_platform }}" /p:PlatformToolset="v143"
 
     - name: Archive artifacts for x64 / Release
       if: matrix.build_platform == 'x64' && matrix.build_configuration == 'Release'
@@ -222,6 +222,8 @@ jobs:
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug'
       working-directory: .\
       run: |
+           echo "${{ needs.before_build.outputs.title }}"
+           echo "$${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }}"
            if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and $${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }} -and (Test-Path -Path "D:\.cache\python")) {
              $Env:PYTHONPATH="D:\.cache\python"
            }
