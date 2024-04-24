@@ -400,7 +400,7 @@ jobs:
       id: cache-lookup
       with:
         path: |
-          'PowerEditor\gcc'
+          PowerEditor\gcc
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
         
@@ -409,7 +409,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          'PowerEditor\gcc' 
+          PowerEditor\gcc
         key: ${{ steps.msys2.outputs.key }}
         
     - name: Make n++ exe
@@ -442,5 +442,5 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
-          'PowerEditor\gcc'
+          PowerEditor\gcc
         key: ${{ steps.msys2.outputs.key }}
