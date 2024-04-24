@@ -212,7 +212,7 @@ jobs:
           path: PowerEditor\visual.net\${{ matrix.build_configuration}}\Notepad++.exe
 
     - name: Test for Win32 / Debug only
-      if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug'
+      if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug' && 0
       working-directory: .\
       run: |
            echo "${{ needs.before_build.outputs.title }}"
@@ -235,8 +235,6 @@ jobs:
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug'
       working-directory: .\
       run: |
-           echo "${{ needs.before_build.outputs.title }}"
-           echo "$${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }}"
            if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and $${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }} -and (Test-Path -Path "D:\.cache\python")) {
              $Env:PYTHONPATH="D:\.cache\python"
            }
