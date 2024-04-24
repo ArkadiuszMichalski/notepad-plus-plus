@@ -360,8 +360,8 @@ jobs:
 
     - name: Setup MSYS2
       id: msys2
-      working-directory: .\
       run: |
+        Write-Output (pwd)
         $Env:Path = 'C:\msys64\usr\bin' + [IO.Path]::PathSeparator + $Env:Path
         if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:MSYSTEM = 'MINGW32'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:Path = 'C:\msys64\mingw32\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
@@ -400,10 +400,8 @@ jobs:
       id: cache-lookup
       with:
         path: |
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build'
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build'
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a'
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a' 
+          'PowerEditor\visual.net'
+          'PowerEditor\gcc'
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
         
@@ -412,10 +410,8 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build'
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build'
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a'
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a' 
+          'PowerEditor\visual.net'
+          'PowerEditor\gcc' 
         key: ${{ steps.msys2.outputs.key }}
         
     - name: Make n++ exe
@@ -427,7 +423,7 @@ jobs:
         Write-Output (((gcc --version) | select-object -first 1) + " " + (gcc -dumpmachine))
         Write-Output (mingw32-make --version) | select-object -first 1
         Write-Output (sh --version) | select-object -first 1
-        mingw32-make -f PowerEditor\gcc\makefile
+        #mingw32-make -f PowerEditor\gcc\makefile
 
     - name: Archive artifacts for ${{ matrix.build_platform}} / Release
       if: matrix.build_configuration == 'Release'
@@ -448,8 +444,6 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build'
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build'
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a'
-          'bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a' 
+          'PowerEditor\visual.net'
+          'PowerEditor\gcc'
         key: ${{ steps.msys2.outputs.key }}
