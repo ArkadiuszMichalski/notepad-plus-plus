@@ -87,6 +87,10 @@ jobs:
           Write-Output "Run standard jobs"
         }
 
+        if ($commit_title -match "\[force nocachepython)\]") {
+          $env:PYTHON_ALLOW_CACHE = "false"
+          Write-Output "PYTHON_ALLOW_CACHE=false" >> $env:GITHUB_ENV
+        }
         if ($Env:PYTHON_ALLOW_CACHE -eq "true") {
           $python = ((python -V) -split " ")[1]
           $requests = (Invoke-RestMethod https://pypi.org/pypi/requests/json).info.version
@@ -95,8 +99,6 @@ jobs:
           $lxml = (Invoke-RestMethod https://pypi.org/pypi/lxml/json).info.version
           $key = "${{ runner.os }}-python_$python-requests_$requests-rfc3987_$rfc3987-pywin32_$pywin32-lxml_$lxml"
           Write-Output "python=$key" >> $env:GITHUB_OUTPUT
-          $needSavePythonCache = ((Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content -notmatch "$key")
-          Write-Output "needSavePythonCache=$needSavePythonCache" >> $env:GITHUB_OUTPUT
         }
 
     - name: (cache) Lookup Python modules
