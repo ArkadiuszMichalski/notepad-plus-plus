@@ -2,7 +2,7 @@ name: CI_build
 
 on: [push, pull_request]
 env:
-  PYTHON_ALLOW_CACHE: false
+  PYTHON_ALLOW_CACHE: true
   MSYS2_ALLOW_UPDATE: true 
   MSYS2_ALLOW_CACHE: true
  
@@ -173,8 +173,7 @@ jobs:
 
     - name: MSBuild of n++ exe
       working-directory: PowerEditor\visual.net\
-      run: |
-           #msbuild notepadPlus.sln /m /p:configuration="${{ matrix.build_configuration }}" /p:platform="${{ matrix.build_platform }}" /p:PlatformToolset="v143"
+      run: msbuild notepadPlus.sln /m /p:configuration="${{ matrix.build_configuration }}" /p:platform="${{ matrix.build_platform }}" /p:PlatformToolset="v143"
 
     - name: Archive artifacts for x64 / Release
       if: matrix.build_platform == 'x64' && matrix.build_configuration == 'Release'
@@ -211,18 +210,6 @@ jobs:
           name: Notepad++.MSVC.${{ matrix.build_platform}}.${{ matrix.build_configuration}}
           path: PowerEditor\visual.net\${{ matrix.build_configuration}}\Notepad++.exe
 
-    - name: Test for Win32 / Debug only
-      if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug' && 0
-      working-directory: .\
-      run: |
-           echo "${{ needs.before_build.outputs.title }}"
-           echo "${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }}"
-           echo "$${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }}"
-           echo "${{ contains(needs.before_build.outputs.title, '[force nopythoncache]') }}"
-           echo "${{ contains(needs.before_build.outputs.title, '[force nopythoncache]') == true }}"
-           echo "$${{ contains(needs.before_build.outputs.title, '[force nopythoncache]') == true }}"
-           echo "${{ needs.before_build.outputs.python }} "
-  
     - name: (cache) Restore Python modules for Win32 / Debug 
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug' && env.PYTHON_ALLOW_CACHE == 'true' && contains(needs.before_build.outputs.title, '[force nopythoncache]') != true
       uses: actions/cache/restore@v4
