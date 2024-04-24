@@ -383,7 +383,7 @@ jobs:
           $gcc_num = ((gcc --version) | select-object -first 1) | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
           $make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
           $hash = "${{ hashFiles('lexilla', 'scintilla', 'PowerEditor\gcc', 'boostregex\nppSpecifics_mingw.mak') }}"
-          $key = "${{ runner.os }}-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-SCILEX_$hash"
+          $key = "${{ runner.os }}-SCILEX-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-HASH_$hash"
         
           Write-Output $gcc_num
           Write-Output $make_num
