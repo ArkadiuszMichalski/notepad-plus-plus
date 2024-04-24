@@ -99,29 +99,29 @@ jobs:
           Write-Output "needSavePythonCache=$needSavePythonCache" >> $env:GITHUB_OUTPUT
         }
 
-    - name: (cache) Check Python modules
+    - name: (cache) Lookup Python modules
       if: env.PYTHON_ALLOW_CACHE == 'true'
       uses: actions/cache@v4
-      id: cache-check
+      id: cache-lookup
       with:
         path: 'D:\.cache\python'
         key: ${{ steps.filter.outputs.python }}   
         lookup-only: true
         
     - name: (cache) Restore Python modules
-      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.result == 'XML'
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.result == 'XML' && steps.cache-lookup.outputs.cache-hit == 'true'
       uses: actions/cache/restore@v4
       with:
         path: 'D:\.cache\python'
         key: ${{ steps.filter.outputs.python }}   
-    
+  
     - name: (cache) Install Python modules
-      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needSavePythonCache == 'true'
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.cache-check.outputs.cache-hit != 'true'
       run: |
         python -m pip install --target D:\.cache\python requests rfc3987 pywin32 lxml
         
     - name: (cache) Save Python modules
-      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.needSavePythonCache == 'true' && github.event_name == 'push'
+      if: env.PYTHON_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
       with:
         path: 'D:\.cache\python'
@@ -130,8 +130,6 @@ jobs:
     - name: XML validation
       if: steps.filter.outputs.result == 'XML'
       run: |
-        echo ${{ toJson(steps.cache-check.outputs) }}
-        Exit
         if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and (Test-Path -Path "D:\.cache\python")) {
           $Env:PYTHONPATH="D:\.cache\python"
         }
