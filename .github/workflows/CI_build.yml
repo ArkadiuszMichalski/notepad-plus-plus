@@ -368,7 +368,7 @@ jobs:
         if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:MSYSTEM = 'MINGW64'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:Path = 'C:\msys64\mingw64\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_configuration == 'Debug'}} ) {$Env:DEBUG = '1'; Write-Output "DEBUG=$Env:DEBUG" >> $env:GITHUB_ENV}
-        if ($Env:MSYS2_ALLOW_UPDATE -eq "true") {
+        if ($Env:MSYS2_ALLOW_UPDATE -eq "trueeeee") {
           Write-Output "Update MSYS2 and GCC and MAKE"
           bash -lc "pacman --noconfirm -Syuu"
           bash -lc "pacman --noconfirm -Syuu"
@@ -400,7 +400,6 @@ jobs:
       id: cache-lookup
       with:
         path: |
-          'PowerEditor\visual.net'
           'PowerEditor\gcc'
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
@@ -410,7 +409,6 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          'PowerEditor\visual.net'
           'PowerEditor\gcc' 
         key: ${{ steps.msys2.outputs.key }}
         
@@ -444,6 +442,5 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
-          'PowerEditor\visual.net'
           'PowerEditor\gcc'
         key: ${{ steps.msys2.outputs.key }}
