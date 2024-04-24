@@ -90,7 +90,7 @@ jobs:
         if ($commit_title -match "\[force nopythoncache\]") {
           $env:PYTHON_ALLOW_CACHE = "false"
           Write-Output "PYTHON_ALLOW_CACHE=false" >> $env:GITHUB_ENV
-        }
+        } 
         if ($Env:PYTHON_ALLOW_CACHE -eq "true") {echo "aaaaaaaaaaaaa"
           $python = ((python -V) -split " ")[1]
           $requests = (Invoke-RestMethod https://pypi.org/pypi/requests/json).info.version
