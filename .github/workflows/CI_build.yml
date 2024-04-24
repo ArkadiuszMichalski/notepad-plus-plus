@@ -7,7 +7,7 @@ env:
   MSYS2_ALLOW_CACHE: true
  
 jobs: 
-  before_build:
+  before_build: 
 
     runs-on: windows-latest
     outputs:
