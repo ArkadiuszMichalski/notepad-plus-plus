@@ -367,7 +367,7 @@ jobs:
         if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:MSYSTEM = 'MINGW64'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:Path = 'C:\msys64\mingw64\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_configuration == 'Debug'}} ) {$Env:DEBUG = '1'; Write-Output "DEBUG=$Env:DEBUG" >> $env:GITHUB_ENV}
-        if ($Env:MSYS2_ALLOW_UPDATE -eq "true") {
+        if ($Env:MSYS2_ALLOW_UPDATE -eq "trueeeeeee") {
           Write-Output "Update MSYS2 and GCC and MAKE"
           bash -lc "pacman --noconfirm -Syuu"
           bash -lc "pacman --noconfirm -Syuu"
@@ -381,7 +381,7 @@ jobs:
         }
         if ($Env:MSYS2_SCILEX_ALLOW_CACHE -eq "true") {        
           $gcc_num = ((gcc --version) | select-object -first 1) | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
-          $make_num = (mingw32-make --version) | select-object -first 1 -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
+          $make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
           $hash = ${{ hashFiles('lexilla', 'scintilla', 'PowerEditor\gcc') }}
         
           Write-Output $gcc_num
