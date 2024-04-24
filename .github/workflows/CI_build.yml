@@ -98,11 +98,19 @@ jobs:
           $needSavePythonCache = ((Invoke-WebRequest ${{ github.api_url }}/repos/${{ github.repository }}/actions/caches).content -notmatch "$key")
           Write-Output "needSavePythonCache=$needSavePythonCache" >> $env:GITHUB_OUTPUT
         }
-    
+
+    - name: (cache) Check Python modules
+      if: env.PYTHON_ALLOW_CACHE == 'true'
+      uses: actions/cache/cache@v4
+      id: cache-check
+      with:
+        path: 'D:\.cache\python'
+        key: ${{ steps.filter.outputs.python }}   
+        lookup-only: true
+        
     - name: (cache) Restore Python modules
       if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.result == 'XML'
       uses: actions/cache/restore@v4
-      id: cache
       with:
         path: 'D:\.cache\python'
         key: ${{ steps.filter.outputs.python }}   
@@ -122,6 +130,8 @@ jobs:
     - name: XML validation
       if: steps.filter.outputs.result == 'XML'
       run: |
+        echo ${{ steps.cache-check.outputs }}
+        Exit
         if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and (Test-Path -Path "D:\.cache\python")) {
           $Env:PYTHONPATH="D:\.cache\python"
         }
