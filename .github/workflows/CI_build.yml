@@ -416,7 +416,7 @@ jobs:
           bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
           bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a
         key: ${{ steps.msys2.outputs.key }}
-        
+         
     - name: Make n++ exe
       working-directory: .\
       run: |
