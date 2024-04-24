@@ -101,7 +101,7 @@ jobs:
 
     - name: (cache) Lookup Python modules
       if: env.PYTHON_ALLOW_CACHE == 'true'
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       id: cache-lookup
       with:
         path: 'D:\.cache\python'
