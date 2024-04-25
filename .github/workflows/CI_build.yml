@@ -420,9 +420,6 @@ jobs:
         Write-Output (((gcc --version) | select-object -first 1) + " " + (gcc -dumpmachine))
         Write-Output (mingw32-make --version) | select-object -first 1
         Write-Output (sh --version) | select-object -first 1
-        
-        Write-Output (Get-ChildItem -Path D:\a\notepad-plus-plus\notepad-plus-plus\PowerEditor -Recurse -File -Force -ErrorAction SilentlyContinue)
-        
         #mingw32-make -f PowerEditor\gcc\makefile
  
     - name: Archive artifacts for ${{ matrix.build_platform}} / Release
