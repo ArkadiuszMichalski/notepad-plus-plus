@@ -3,7 +3,7 @@ name: CI_build
 on: [push, pull_request]
 env:
   PYTHON_ALLOW_CACHE: true
-  SCILEX_MSYS2_ALLOW_CACHE: true
+  SCILEX_MSYS2_ALLOW_CACHE: false
   MSYS2_ALLOW_UPDATE: true 
   
 jobs: 
@@ -371,10 +371,11 @@ jobs:
           Write-Output "Update MSYS2 and GCC and MAKE"
           bash -lc "pacman --noconfirm -Syuu"
           bash -lc "pacman --noconfirm -Syuu"
-          if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make"}
-          if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make"}
+          if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-x86_64-ccache"}
+          if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-i686-ccache"}
         }
-
+        Write-Output (where ccache)
+        Write-Output (ccache --version)
         if ($commit_title -match "\[force noscilexcache\]") {
           $env:SCILEX_MSYS2_ALLOW_CACHE = "false"
           Write-Output "SCILEX_MSYS2_ALLOW_CACHE=false" >> $env:GITHUB_ENV
