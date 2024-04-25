@@ -423,7 +423,11 @@ jobs:
         Write-Output (((gcc --version) | select-object -first 1) + " " + (gcc -dumpmachine))
         Write-Output (mingw32-make --version) | select-object -first 1
         Write-Output (sh --version) | select-object -first 1
-        #mingw32-make -f PowerEditor\gcc\makefile CXX="ccache g++"
+        mingw32-make -f PowerEditor\gcc\makefile CXX="ccache g++"
+
+        Write-Output (ccache -s)
+        Write-Output (ccache -p)
+        
         #Write-Output (Get-ChildItem -Path D:\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
  
     - name: Archive artifacts for ${{ matrix.build_platform}} / Release
