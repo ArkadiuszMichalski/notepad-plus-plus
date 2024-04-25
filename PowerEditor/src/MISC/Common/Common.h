@@ -25,7 +25,7 @@
 #include <tchar.h>
 
 
-const bool dirUp = true;const bool dirUpppp = true;
+const bool dirUp = true;
 const bool dirDown = false;
 
 #define NPP_CP_WIN_1252           1252
