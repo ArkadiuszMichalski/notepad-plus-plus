@@ -399,10 +399,7 @@ jobs:
       id: cache-lookup
       with:
         path: |
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a
+          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
         
@@ -411,10 +408,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a
+          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
         key: ${{ steps.msys2.outputs.key }}
          
     - name: Make n++ exe
@@ -447,8 +441,5 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a
+          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
         key: ${{ steps.msys2.outputs.key }}
