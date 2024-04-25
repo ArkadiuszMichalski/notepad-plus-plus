@@ -421,7 +421,7 @@ jobs:
         Write-Output (mingw32-make --version) | select-object -first 1
         Write-Output (sh --version) | select-object -first 1
         
-        Write-Output (Get-ChildItem -Path pwd -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output (Get-ChildItem -Path D:\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         
         #mingw32-make -f PowerEditor\gcc\makefile
  
