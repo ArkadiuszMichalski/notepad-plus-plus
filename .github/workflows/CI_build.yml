@@ -3,7 +3,7 @@ name: CI_build
 on: [push, pull_request]
 env:
   PYTHON_ALLOW_CACHE: true
-  SCILEX_MSYS2_ALLOW_CACHE: false
+  SCILEX_MSYS2_ALLOW_CACHE: true
   MSYS2_ALLOW_UPDATE: true 
   
 jobs: 
@@ -402,7 +402,7 @@ jobs:
       id: cache-lookup
       with:
         path: |
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
+          D:\ccache
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
         
@@ -411,7 +411,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
+          D:\ccache
         key: ${{ steps.msys2.outputs.key }}
          
     - name: Make n++ exe
@@ -458,5 +458,5 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
+          D:\ccache
         key: ${{ steps.msys2.outputs.key }}
