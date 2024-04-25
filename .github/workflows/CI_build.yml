@@ -426,7 +426,10 @@ jobs:
         mingw32-make -f PowerEditor\gcc\makefile CXX="ccache g++"
 
         Write-Output (ccache -s)
+        Write-Output "========="
         Write-Output (ccache -p)
+
+        Write-Output (Get-ChildItem -Path C:\Users\runneradmin\AppData\Local\ccache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         
         #Write-Output (Get-ChildItem -Path D:\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
  
