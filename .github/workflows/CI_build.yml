@@ -371,8 +371,8 @@ jobs:
           Write-Output "Update MSYS2 and GCC and MAKE"
           bash -lc "pacman --noconfirm -Syuu"
           bash -lc "pacman --noconfirm -Syuu"
-          if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-x86_64-ccache"}
-          if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-i686-ccache"}
+          if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-ccache"}
+          if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-ccache"}
         }
         Write-Output (where ccache)
         Write-Output (ccache --version)
