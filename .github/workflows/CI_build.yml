@@ -134,7 +134,7 @@ jobs:
       if: steps.filter.outputs.result == 'XML'
       run: |
         if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and (Test-Path -Path ${{ env.PYTHON_DIR_CACHE }})) {
-          $Env:PYTHONPATH = ${{ env.PYTHON_DIR_CACHE }}
+          $Env:PYTHONPATH = "${{ env.PYTHON_DIR_CACHE }}"
         }
         else {
           python -m pip install requests rfc3987 pywin32 lxml
@@ -223,7 +223,7 @@ jobs:
       working-directory: .\
       run: |
            if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and $${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }} -and (Test-Path -Path ${{ env.PYTHON_DIR_CACHE }})) {
-             $Env:PYTHONPATH = ${{ env.PYTHON_DIR_CACHE }}
+             $Env:PYTHONPATH = "${{ env.PYTHON_DIR_CACHE }}"
            }
            else {
              python -m pip install requests rfc3987 pywin32 lxml
