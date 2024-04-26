@@ -374,7 +374,7 @@ jobs:
           if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make"}
           if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make"}
         }
-        if ($commit_title -match "\[force noscilexcache\]") {
+        if ($${{ contains(needs.before_build.outputs.title, '[force noscilexcache]') }}) {
           $env:SCILEX_MSYS2_ALLOW_CACHE = "false"
           Write-Output "SCILEX_MSYS2_ALLOW_CACHE=false" >> $env:GITHUB_ENV
         }
