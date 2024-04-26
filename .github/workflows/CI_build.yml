@@ -431,10 +431,10 @@ jobs:
         $newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\ccache" DIR_O'
         $newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
 
-        #Write-Output $newContent
+        Write-Output $newContent
         
         #mingw32-make -f PowerEditor\gcc\makefile CXX="ccache g++"
-        mingw32-make -f PowerEditor\gcc\makefile
+        #mingw32-make -f PowerEditor\gcc\makefile
  
         #Write-Output (ccache -s)
         #Write-Output "========="
