@@ -6,7 +6,7 @@ env:
   PYTHON_DIR_CACHE: D:\.cache\python
   SCILEX_MSYS2_ALLOW_CACHE: true
   MSYS2_ALLOW_UPDATE: true 
-  
+   
 jobs: 
   before_build: 
   
