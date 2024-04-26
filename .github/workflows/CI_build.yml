@@ -371,25 +371,25 @@ jobs:
           Write-Output "Update MSYS2 and GCC and MAKE"
           bash -lc "pacman --noconfirm -Syuu"
           bash -lc "pacman --noconfirm -Syuu"
-          if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-ccache"}
-          if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-ccache"}
+          if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make"}
+          if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make"}
         }
-        Write-Output (where ccache)
-        Write-Output (ccache --version)
-        Write-Output (ccache -s)
-
         if ($commit_title -match "\[force noscilexcache\]") {
           $env:SCILEX_MSYS2_ALLOW_CACHE = "false"
           Write-Output "SCILEX_MSYS2_ALLOW_CACHE=false" >> $env:GITHUB_ENV
         }
-        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true") {        
-          $gcc_num = ((gcc --version) | select-object -first 1) | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
+        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true") { 
+          Write-Output "Install CCACHE"
+          bash -lc "pacman --noconfirm -S ${{ matrix.build_platform == 'i686' && mingw-w64-i686-ccache || mingw-w64-x86_64-ccache }}
+          $gcc_num = (gcc --version) | select-object -first 1 | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
           $make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
-          $hash = "${{ hashFiles('lexilla', 'scintilla', 'PowerEditor\gcc', 'boostregex\nppSpecifics_mingw.mak') }}"
-          $key = "${{ runner.os }}-SCILEX-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-HASH_$hash"
+          $ccache_num = (ccache --version) | select-object -first 1 | Select-String -Pattern 'n (.*)' | %{$_.Matches.Groups[1].value}
+          $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla', 'PowerEditor\gcc') }}"
+          $key = "${{ runner.os }}-SCILEX-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-CCACHE_$ccache_num-HASH_$hash"
         
           Write-Output $gcc_num
           Write-Output $make_num
+          Write-Output $ccache_num
           Write-Output $hash
           Write-Output $key
 
@@ -402,7 +402,7 @@ jobs:
       id: cache-lookup
       with:
         path: |
-          D:\ccache
+          D:\.cache\ccache
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
         
@@ -411,30 +411,31 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          D:\ccache
+          D:\.cache\ccache
         key: ${{ steps.msys2.outputs.key }}
          
     - name: Make n++ exe
       working-directory: .\
       run: |
-        Write-host "${{ matrix.build_platform }}"
-        Write-host "${{ matrix.build_configuration }}"
+        Write-Output "${{ matrix.build_platform }}"
+        Write-Output "${{ matrix.build_configuration }}"
         Write-Output "Tools version:"
         Write-Output (((gcc --version) | select-object -first 1) + " " + (gcc -dumpmachine))
         Write-Output (mingw32-make --version) | select-object -first 1
         Write-Output (sh --version) | select-object -first 1
+        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true") { 
+          Write-Output (ccache --version) | select-object -first 1
+          $content = Get-Content -Path 'PowerEditor\gcc\makefile'
+          $newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\.cache\ccache" DIR_O'
+          $newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
+        }
+        #mingw32-make -f PowerEditor\gcc\makefile
 
-        #$Env:CCACHE_DIR = "D:\ccache"
-
-        $content = Get-Content -Path 'PowerEditor\gcc\makefile'
+        #$Env:CCACHE_DIR = "D:\.cache\ccache"
         #$newContent = $content -replace 'DIR_O', 'CCACHE_DIR=D:\ccache\_SciLex DIR_O'
-        $newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\ccache" DIR_O'
-        $newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
-
         #Write-Output $newContent
          
         #mingw32-make -f PowerEditor\gcc\makefile CXX="ccache g++"
-        mingw32-make -f PowerEditor\gcc\makefile
 
         if (0){
         Write-Output (ccache -s)
@@ -442,7 +443,7 @@ jobs:
         Write-Output (ccache -p)
 
         Write-Output "========="
-        Write-Output (Get-ChildItem -Path D:\ccache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output (Get-ChildItem -Path D:\.cache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         Write-Output "========="
         Write-Output (Get-ChildItem -Path C:\Users\runneradmin\AppData\Local\ccache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
 
@@ -468,5 +469,5 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
-          D:\ccache
+          D:\.cache\ccache
         key: ${{ steps.msys2.outputs.key }}
