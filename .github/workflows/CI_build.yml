@@ -425,8 +425,15 @@ jobs:
         Write-Output (sh --version) | select-object -first 1
 
         $Env:CCACHE_DIR = "D:\ccache"
+
+        $content = Get-Content -Path 'PowerEditor\gcc\makefile'
+        #$newContent = $content -replace 'DIR_O', 'CCACHE_DIR=D:\ccache\_SciLex DIR_O'
+        $newContent = $content -replace 'DIR_O', 'CXX="ccache g++" DIR_O'
+        $newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
+
+        Write-Output $newContent
         
-        mingw32-make -f PowerEditor\gcc\makefile CXX="ccache g++"
+        #mingw32-make -f PowerEditor\gcc\makefile CXX="ccache g++"
  
         #Write-Output (ccache -s)
         #Write-Output "========="
