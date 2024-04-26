@@ -431,21 +431,23 @@ jobs:
         $newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\ccache" DIR_O'
         $newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
 
-        Write-Output $newContent
+        #Write-Output $newContent
         
         #mingw32-make -f PowerEditor\gcc\makefile CXX="ccache g++"
-        #mingw32-make -f PowerEditor\gcc\makefile
- 
-        #Write-Output (ccache -s)
-        #Write-Output "========="
-        #Write-Output (ccache -p)
+        mingw32-make -f PowerEditor\gcc\makefile
 
-        #Write-Output "========="
-        #Write-Output (Get-ChildItem -Path D:\ccache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-        #Write-Output "========="
-        #Write-Output (Get-ChildItem -Path C:\Users\runneradmin\AppData\Local\ccache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        if (1){
+        Write-Output (ccache -s)
+        Write-Output "========="
+        Write-Output (ccache -p)
 
-        ##Write-Output (Get-ChildItem -Path D:\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output "========="
+        Write-Output (Get-ChildItem -Path D:\ccache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output "========="
+        Write-Output (Get-ChildItem -Path C:\Users\runneradmin\AppData\Local\ccache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+
+        #Write-Output (Get-ChildItem -Path D:\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        }
  
     - name: Archive artifacts for ${{ matrix.build_platform}} / Release
       if: matrix.build_configuration == 'Release'
