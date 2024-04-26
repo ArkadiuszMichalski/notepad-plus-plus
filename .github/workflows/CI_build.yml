@@ -68,7 +68,7 @@ jobs:
                     #Write-Output "PYTHON_ALLOW_CACHE=false" >> $env:GITHUB_ENV
                     gh run cancel ${{ github.run_id }}
                     gh run watch ${{ github.run_id }}
-                    Exit
+                    Exit 
                 }
                 else {
                     Write-Output "Run only XML validation step"
