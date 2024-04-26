@@ -65,7 +65,8 @@ jobs:
                 if (@($files_modified | Where-Object {$_ -notmatch "\.($files_nowork)$|$folders_nowork"}).length -eq 0 -or $commit_title -match "\[force none\]") {
                     Write-Output "Changed files on this commit don't require any additional tasks.`n"
                     Write-Output "result=OK" >> $env:GITHUB_OUTPUT
-                    Write-Output "PYTHON_ALLOW_CACHE=false" >> $env:GITHUB_ENV
+                    #Write-Output "PYTHON_ALLOW_CACHE=false" >> $env:GITHUB_ENV
+                    gh run cancel ${{ github.run_id }}
                     Exit
                 }
                 else {
