@@ -153,7 +153,7 @@ jobs:
 
     runs-on: windows-latest
     needs: before_build
-    if: (needs.before_build.outputs.result == '' || needs.before_build.outputs.result == 'ONEJOB') && 0
+    if: (needs.before_build.outputs.result == '' || needs.before_build.outputs.result == 'ONEJOB') && 1
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.before_build.outputs.matrix) }}
@@ -174,7 +174,7 @@ jobs:
 
     - name: MSBuild of n++ exe
       working-directory: PowerEditor\visual.net\
-      run: msbuild notepadPlus.sln /m /p:configuration="${{ matrix.build_configuration }}" /p:platform="${{ matrix.build_platform }}" /p:PlatformToolset="v143"
+      run: #msbuild notepadPlus.sln /m /p:configuration="${{ matrix.build_configuration }}" /p:platform="${{ matrix.build_platform }}" /p:PlatformToolset="v143"
 
     - name: Archive artifacts for x64 / Release
       if: matrix.build_platform == 'x64' && matrix.build_configuration == 'Release'
