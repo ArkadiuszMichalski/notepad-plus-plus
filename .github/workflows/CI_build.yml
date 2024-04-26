@@ -66,6 +66,7 @@ jobs:
                     Write-Output "Changed files on this commit don't require any additional tasks.`n"
                     Write-Output "result=OK" >> $env:GITHUB_OUTPUT
                     #Write-Output "PYTHON_ALLOW_CACHE=false" >> $env:GITHUB_ENV
+                    $env:GH_TOKEN = "${{ github.token }}"
                     gh run cancel ${{ github.run_id }}
                     gh run watch ${{ github.run_id }}
                     Exit 
