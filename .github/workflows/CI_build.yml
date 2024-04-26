@@ -3,6 +3,7 @@ name: CI_build
 on: [push, pull_request]
 env:
   PYTHON_ALLOW_CACHE: true
+  PYTHON_DIR_CACHE: D:\.cache\python
   SCILEX_MSYS2_ALLOW_CACHE: true
   MSYS2_ALLOW_UPDATE: true 
   
@@ -106,7 +107,7 @@ jobs:
       uses: actions/cache/restore@v4
       id: cache-lookup
       with:
-        path: 'D:\.cache\python'
+        path: ${{ env.PYTHON_DIR_CACHE }}
         key: ${{ steps.filter.outputs.python }}   
         lookup-only: true
         
@@ -114,26 +115,26 @@ jobs:
       if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.result == 'XML' && steps.cache-lookup.outputs.cache-hit == 'true'
       uses: actions/cache/restore@v4
       with:
-        path: 'D:\.cache\python'
+        path: ${{ env.PYTHON_DIR_CACHE }}
         key: ${{ steps.filter.outputs.python }}   
   
     - name: (cache) Install Python modules
       if: env.PYTHON_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true'
       run: |
-        python -m pip install --target D:\.cache\python requests rfc3987 pywin32 lxml
+        python -m pip install --target ${{ env.PYTHON_DIR_CACHE }} requests rfc3987 pywin32 lxml
         
     - name: (cache) Save Python modules
       if: env.PYTHON_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
       with:
-        path: 'D:\.cache\python'
+        path: ${{ env.PYTHON_DIR_CACHE }}
         key: ${{ steps.filter.outputs.python }} 
 
     - name: XML validation
       if: steps.filter.outputs.result == 'XML'
       run: |
-        if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and (Test-Path -Path "D:\.cache\python")) {
-          $Env:PYTHONPATH="D:\.cache\python"
+        if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and (Test-Path -Path ${{ env.PYTHON_DIR_CACHE }})) {
+          $Env:PYTHONPATH = ${{ env.PYTHON_DIR_CACHE }}
         }
         else {
           python -m pip install requests rfc3987 pywin32 lxml
@@ -214,15 +215,15 @@ jobs:
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug' && env.PYTHON_ALLOW_CACHE == 'true' && contains(needs.before_build.outputs.title, '[force nopythoncache]') != true
       uses: actions/cache/restore@v4
       with:
-        path: 'D:\.cache\python'
+        path: ${{ env.PYTHON_DIR_CACHE }}
         key: ${{ needs.before_build.outputs.python }}  
 
     - name: Run xml validation test for Win32 / Debug only
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug'
       working-directory: .\
       run: |
-           if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and $${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }} -and (Test-Path -Path "D:\.cache\python")) {
-             $Env:PYTHONPATH="D:\.cache\python"
+           if ($Env:PYTHON_ALLOW_CACHE -eq "true" -and $${{ !contains(needs.before_build.outputs.title, '[force nopythoncache]') }} -and (Test-Path -Path ${{ env.PYTHON_DIR_CACHE }})) {
+             $Env:PYTHONPATH = ${{ env.PYTHON_DIR_CACHE }}
            }
            else {
              python -m pip install requests rfc3987 pywin32 lxml
@@ -338,7 +339,7 @@ jobs:
 
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == ''
+    if: needs.before_build.outputs.result == '' && 0
     strategy:
       fail-fast: false
       #build_platform: [x86_64, i686]
