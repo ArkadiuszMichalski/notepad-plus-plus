@@ -436,7 +436,7 @@ jobs:
         #Write-Output $newContent
          
         #mingw32-make -f PowerEditor\gcc\makefile CXX="ccache g++"
-
+ 
         if (0){
         Write-Output (ccache -s)
         Write-Output "========="
