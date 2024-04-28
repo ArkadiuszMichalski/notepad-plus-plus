@@ -360,15 +360,22 @@ jobs:
            $newContent = $content -replace 'TEXT\(\"Notepad\+\+ v.*\"\)', 'TEXT("Notepad++ GH_BUILD")'
            $newContent | Set-Content -Path 'resource.h'
 
-    - name: (cache) Prepare cache info
+    - name: Setup MSYS2 and prepare cache info
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: msys2
       run: |   
+        $Env:Path = 'C:\msys64\usr\bin' + [IO.Path]::PathSeparator + $Env:Path
+        if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:MSYSTEM = 'MINGW32'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
+        if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:Path = 'C:\msys64\mingw32\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
+        if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:MSYSTEM = 'MINGW64'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
+        if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:Path = 'C:\msys64\mingw64\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
+        if ( $${{ matrix.build_configuration == 'Debug'}} ) {$Env:DEBUG = '1'; Write-Output "DEBUG=$Env:DEBUG" >> $env:GITHUB_ENV}
+    
         if ($${{ contains(needs.before_build.outputs.title, '[force noscilexcache]') }}) {
           $env:SCILEX_MSYS2_ALLOW_CACHE = "false"
           Write-Output "SCILEX_MSYS2_ALLOW_CACHE=false" >> $env:GITHUB_ENV
         }
-        else { 
+        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true") { 
           #Write-Output "Install CCACHE"
           #bash -lc "pacman --noconfirm -S ${{ matrix.build_platform == 'i686' && 'mingw-w64-i686-ccache' || 'mingw-w64-x86_64-ccache' }}"
 
@@ -424,21 +431,14 @@ jobs:
         Invoke-WebRequest https://github.com/ccache/ccache/releases/download/v4.9.1/ccache-4.9.1-windows-x86_64.zip -OutFile D:\ccache.zip
         7z e 'D:\ccache.zip' -oD:\.cache\ccache\bin -y
 
-    - name: Setup MSYS2
+    - name: Update MSYS2
+      if: env.MSYS2_ALLOW_UPDATE == 'true'
       run: |
-        $Env:Path = 'C:\msys64\usr\bin' + [IO.Path]::PathSeparator + $Env:Path
-        if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:MSYSTEM = 'MINGW32'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
-        if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:Path = 'C:\msys64\mingw32\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
-        if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:MSYSTEM = 'MINGW64'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
-        if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:Path = 'C:\msys64\mingw64\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
-        if ( $${{ matrix.build_configuration == 'Debug'}} ) {$Env:DEBUG = '1'; Write-Output "DEBUG=$Env:DEBUG" >> $env:GITHUB_ENV}
-        if ($Env:MSYS2_ALLOW_UPDATE -eq "true") {
-          Write-Output "Update MSYS2 and GCC and MAKE"
-          bash -lc "pacman --noconfirm -Syuu"
-          bash -lc "pacman --noconfirm -Syuu"
-          if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make"}
-          if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make"}
-        }
+        Write-Output "Update MSYS2 and GCC and MAKE"
+        bash -lc "pacman --noconfirm -Syuu"
+        bash -lc "pacman --noconfirm -Syuu"
+        if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make"}
+        if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make"}
         
     - name: Make n++ exe
       working-directory: .\
