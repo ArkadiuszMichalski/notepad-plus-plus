@@ -392,7 +392,7 @@ jobs:
           
           #$ccache_num = (ccache --version) | select-object -first 1 | Select-String -Pattern 'n (.*)' | %{$_.Matches.Groups[1].value}
           
-          $ccache_num = (Invoke-RestMethod https://api.github.com/repos/ccache/ccache/releases/latest) | Select-String 'download.*ccache-(.*)-windows-${{ matrix.build_platform }}' | %{$_.Matches.Groups[1].value}
+          $ccache_num = (Invoke-RestMethod https://github.com/ccache/ccache/releases/latest) | Select-String 'download.*ccache-(.*)-windows-${{ matrix.build_platform }}' | %{$_.Matches.Groups[1].value}
            
           $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla', 'PowerEditor\gcc') }}"
           $key = "${{ runner.os }}-SCILEX-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-CCACHE_$ccache_num-HASH_$hash"
@@ -429,7 +429,7 @@ jobs:
     - name: (cache) Install CCACHE
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true'
       run: |
-        $ccache_num = (Invoke-RestMethod https://api.github.com/repos/ccache/ccache/releases/latest) | Select-String 'download.*ccache-(.*)-windows-${{ matrix.build_platform }}' | %{$_.Matches.Groups[1].value}
+        $ccache_num = (Invoke-RestMethod https://github.com/ccache/ccache/releases/latest) | Select-String 'download.*ccache-(.*)-windows-${{ matrix.build_platform }}' | %{$_.Matches.Groups[1].value}
         Invoke-WebRequest https://github.com/ccache/ccache/releases/download/v4.9.1/ccache-4.9.1-windows-x86_64.zip -OutFile D:\ccache.zip
         7z e 'D:\ccache.zip' -oD:\.cache\ccache\bin -y
 
