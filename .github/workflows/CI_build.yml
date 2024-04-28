@@ -1,5 +1,5 @@
 name: CI_build
- 
+
 on: [push, pull_request]
 env:
   PYTHON_ALLOW_CACHE: true
@@ -360,8 +360,71 @@ jobs:
            $newContent = $content -replace 'TEXT\(\"Notepad\+\+ v.*\"\)', 'TEXT("Notepad++ GH_BUILD")'
            $newContent | Set-Content -Path 'resource.h'
 
-    - name: Setup MSYS2
+    - name: (cache) Prepare cache info
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: msys2
+      run: |   
+        if ($${{ contains(needs.before_build.outputs.title, '[force noscilexcache]') }}) {
+          $env:SCILEX_MSYS2_ALLOW_CACHE = "false"
+          Write-Output "SCILEX_MSYS2_ALLOW_CACHE=false" >> $env:GITHUB_ENV
+        }
+        else { 
+          #Write-Output "Install CCACHE"
+          #bash -lc "pacman --noconfirm -S ${{ matrix.build_platform == 'i686' && 'mingw-w64-i686-ccache' || 'mingw-w64-x86_64-ccache' }}"
+
+          if ($Env:MSYS2_ALLOW_UPDATE -eq "true") {
+            $gcc_num = (bash -lc "pacman -Ss mingw-w64-${{ matrix.build_platform-gcc") | Select-String -Pattern "-gcc (.*) \(" | %{$_.Matches.Groups[1].value}
+            $make_num = (bash -lc "pacman -Ss mingw-w64-${{ matrix.build_platform-make") | Select-String -Pattern "-make (.*) \(" | %{$_.Matches.Groups[1].value}
+          }
+          else {
+            $gcc_num = (gcc --version) | select-object -first 1 | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
+            $make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
+          }
+          
+          #$ccache_num = (ccache --version) | select-object -first 1 | Select-String -Pattern 'n (.*)' | %{$_.Matches.Groups[1].value}
+          
+          $ccache_num = (Invoke-RestMethod https://api.github.com/repos/ccache/ccache/releases/latest) | Select-String 'download.*ccache-(.*)-windows-${{ matrix.build_platform }}' | %{$_.Matches.Groups[1].value}
+          
+          $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla', 'PowerEditor\gcc') }}"
+          $key = "${{ runner.os }}-SCILEX-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-CCACHE_$ccache_num-HASH_$hash"
+        
+          Write-Output $gcc_num
+          Write-Output $make_num
+          Write-Output $ccache_num
+          Write-Output $hash
+          Write-Output $key
+  
+          Write-Output "key=$key" >> $env:GITHUB_OUTPUT
+        }
+    
+    - name: (cache) Lookup MSYS2 and CCACHE and SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
+      uses: actions/cache/restore@v4
+      id: cache-lookup
+      with:
+        path: |
+          C:\msys64\var\cache
+          D:\.cache\ccache
+        key: ${{ steps.msys2.outputs.key }}   
+        lookup-only: true
+        
+    - name: (cache) Restore MSYS2 and CCACHE and SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          C:\msys64\var\cache
+          D:\.cache\ccache
+        key: ${{ steps.msys2.outputs.key }}
+
+    - name: (cache) Install CCACHE
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true'
+      run: |
+        $ccache_num = (Invoke-RestMethod https://api.github.com/repos/ccache/ccache/releases/latest) | Select-String 'download.*ccache-(.*)-windows-${{ matrix.build_platform }}' | %{$_.Matches.Groups[1].value}
+        Invoke-WebRequest https://github.com/ccache/ccache/releases/download/v4.9.1/ccache-4.9.1-windows-x86_64.zip -OutFile D:\ccache.zip
+        7z e 'D:\ccache.zip' -oD:\.cache\ccache\bin -y
+
+    - name: Setup MSYS2
       run: |
         $Env:Path = 'C:\msys64\usr\bin' + [IO.Path]::PathSeparator + $Env:Path
         if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:MSYSTEM = 'MINGW32'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
@@ -376,46 +439,7 @@ jobs:
           if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make"}
           if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make"}
         }
-        if ($${{ contains(needs.before_build.outputs.title, '[force noscilexcache]') }}) {
-          $env:SCILEX_MSYS2_ALLOW_CACHE = "false"
-          Write-Output "SCILEX_MSYS2_ALLOW_CACHE=false" >> $env:GITHUB_ENV
-        }
-        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true") { 
-          Write-Output "Install CCACHE"
-          bash -lc "pacman --noconfirm -S ${{ matrix.build_platform == 'i686' && 'mingw-w64-i686-ccache' || 'mingw-w64-x86_64-ccache' }}"
-          $gcc_num = (gcc --version) | select-object -first 1 | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
-          $make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
-          $ccache_num = (ccache --version) | select-object -first 1 | Select-String -Pattern 'n (.*)' | %{$_.Matches.Groups[1].value}
-          $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla', 'PowerEditor\gcc') }}"
-          $key = "${{ runner.os }}-SCILEX-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-CCACHE_$ccache_num-HASH_$hash"
         
-          Write-Output $gcc_num
-          Write-Output $make_num
-          Write-Output $ccache_num
-          Write-Output $hash
-          Write-Output $key
-
-          Write-Output "key=$key" >> $env:GITHUB_OUTPUT
-        }
-
-    - name: (cache) Lookup SciLex files
-      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
-      uses: actions/cache/restore@v4
-      id: cache-lookup
-      with:
-        path: |
-          D:\.cache\ccache
-        key: ${{ steps.msys2.outputs.key }}   
-        lookup-only: true
-        
-    - name: (cache) Restore SciLex files
-      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
-      uses: actions/cache/restore@v4
-      with:
-        path: |
-          D:\.cache\ccache
-        key: ${{ steps.msys2.outputs.key }}
-         
     - name: Make n++ exe
       working-directory: .\
       run: |
@@ -425,13 +449,13 @@ jobs:
         Write-Output (((gcc --version) | select-object -first 1) + " " + (gcc -dumpmachine))
         Write-Output (mingw32-make --version) | select-object -first 1
         Write-Output (sh --version) | select-object -first 1
-        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true") { 
+        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and (Test-Path -Path D:\.cache\ccache)) {
           Write-Output (ccache --version) | select-object -first 1
           $content = Get-Content -Path 'PowerEditor\gcc\makefile'
-          $newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\.cache\ccache" DIR_O'
+          $newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\.cache\ccache\scilex" DIR_O'
           $newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
         }
-        mingw32-make -f PowerEditor\gcc\makefile
+        #mingw32-make -f PowerEditor\gcc\makefile
 
         #$Env:CCACHE_DIR = "D:\.cache\ccache"
         #$newContent = $content -replace 'DIR_O', 'CCACHE_DIR=D:\ccache\_SciLex DIR_O'
@@ -466,10 +490,11 @@ jobs:
           name: Notepad++.GCC.${{ matrix.build_platform}}.${{ matrix.build_configuration}}
           path: bin.${{ matrix.build_platform}}-debug\notepad++.exe
 
-    - name: (cache) Save SciLex files
+    - name: (cache) Save MSYS2 and CCACHE and SciLex files
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
       with:
         path: |
+          C:\msys64\var\cache
           D:\.cache\ccache
         key: ${{ steps.msys2.outputs.key }}
