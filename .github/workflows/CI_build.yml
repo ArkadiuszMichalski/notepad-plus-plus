@@ -457,7 +457,7 @@ jobs:
           $newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\.cache\ccache\scilex" DIR_O'
           $newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
         }
-        #mingw32-make -f PowerEditor\gcc\makefile
+        mingw32-make -f PowerEditor\gcc\makefile
 
         #$Env:CCACHE_DIR = "D:\.cache\ccache"
         #$newContent = $content -replace 'DIR_O', 'CCACHE_DIR=D:\ccache\_SciLex DIR_O'
