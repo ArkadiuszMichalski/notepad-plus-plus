@@ -370,7 +370,7 @@ jobs:
         if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:MSYSTEM = 'MINGW64'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:Path = 'C:\msys64\mingw64\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
         if ( $${{ matrix.build_configuration == 'Debug'}} ) {$Env:DEBUG = '1'; Write-Output "DEBUG=$Env:DEBUG" >> $env:GITHUB_ENV}
-        if ($Env:MSYS2_ALLOW_UPDATE == 'true') {
+        if ($Env:MSYS2_ALLOW_UPDATE -eq "true") {
           Write-Output "Update MSYS2 and GCC and MAKE"
           bash -lc "pacman --noconfirm -Syuu"
           bash -lc "pacman --noconfirm -Syuu"
