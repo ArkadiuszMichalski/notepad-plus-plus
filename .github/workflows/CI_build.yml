@@ -405,7 +405,7 @@ jobs:
   
           Write-Output "key=$key" >> $env:GITHUB_OUTPUT
         }
-    
+     
     - name: (cache) Lookup Ccache and SciLex files
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       uses: actions/cache/restore@v4
