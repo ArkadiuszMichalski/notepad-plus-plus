@@ -426,7 +426,7 @@ jobs:
           D:\.cache\ccache
         key: ${{ steps.msys2.outputs.key }}
 
-    - name: (cache) Install CCACHE
+    - name: (cache) Install Ccache
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true'
       run: |
         $ccache_num = (Invoke-RestMethod https://github.com/ccache/ccache/releases/latest) | Select-String 'download.*ccache-(.*)-windows-${{ matrix.build_platform }}' | %{$_.Matches.Groups[1].value}
