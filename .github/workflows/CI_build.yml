@@ -393,7 +393,7 @@ jobs:
           #$ccache_num = (ccache --version) | select-object -first 1 | Select-String -Pattern 'n (.*)' | %{$_.Matches.Groups[1].value}
           
           $ccache_num = (Invoke-RestMethod https://api.github.com/repos/ccache/ccache/releases/latest) | Select-String 'download.*ccache-(.*)-windows-${{ matrix.build_platform }}' | %{$_.Matches.Groups[1].value}
-          
+           
           $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla', 'PowerEditor\gcc') }}"
           $key = "${{ runner.os }}-SCILEX-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-CCACHE_$ccache_num-HASH_$hash"
         
