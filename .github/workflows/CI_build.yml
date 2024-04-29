@@ -324,9 +324,9 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-           $Env:CXX = "ccache cl"
+           #$Env:CXX = "ccache cl"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
-           nmake -f scintilla.mak
+           nmake -f scintilla.mak -D"CXX=ccache cl"
 
     - name: build lexilla
       working-directory: lexilla/src/
