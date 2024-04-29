@@ -496,6 +496,8 @@ jobs:
           $newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
         }
         mingw32-make -f PowerEditor\gcc\makefile
+        
+        $Env:CCACHE_DIR = "D:\.cache\ccache"
         Write-Output (ccache -s -v -v)
 
         #$Env:CCACHE_DIR = "D:\.cache\ccache"
