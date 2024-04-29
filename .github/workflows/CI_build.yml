@@ -353,6 +353,18 @@ jobs:
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
            nmake -f lexilla.mak
 
+
+          if (1) {
+          Write-Output (ccache -s -v -v)
+          Write-Output "========="
+          Write-Output (ccache -p)
+  
+          Write-Output "========="
+          Write-Output (Get-ChildItem -Path D:\.cache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+
+          exit 1
+          }
+
     - name: (cache) Save Ccache and SciLex files
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
@@ -364,18 +376,6 @@ jobs:
     - name: generate cmake
       working-directory: PowerEditor/src
       run: |
-
-          if (1) {
-          Write-Output (ccache -s)
-          Write-Output "========="
-          Write-Output (ccache -p)
-  
-          Write-Output "========="
-          Write-Output (Get-ChildItem -Path D:\.cache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-
-          exit 1
-          }
-      
            mkdir _build
            cd _build
            cmake -G "Visual Studio 17 2022" -A ${{ matrix.build_platform }} -T "v143" ..
