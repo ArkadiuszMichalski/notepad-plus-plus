@@ -409,7 +409,7 @@ jobs:
            $content = Get-Content -Path 'resource.h'
            $newContent = $content -replace 'TEXT\(\"Notepad\+\+ v.*\"\)', 'TEXT("Notepad++ GH_BUILD")'
            $newContent | Set-Content -Path 'resource.h'
-
+ 
     - name: Setup MSYS2 and prepare cache info
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: msys2
