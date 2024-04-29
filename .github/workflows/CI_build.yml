@@ -313,6 +313,24 @@ jobs:
       with:
         arch: ${{ matrix.arch }}
 
+    - name: (cache) Lookup Ccache and SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
+      uses: actions/cache/restore@v4
+      id: cache-lookup
+      with:
+        path: |
+          D:\.cache\ccache
+        key: cmake
+        lookup-only: true
+
+    - name: (cache) Restore Ccache and SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          D:\.cache\ccache
+        key: cmake
+
     - name: (cache) Install Ccache
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true'
       run: |
@@ -324,9 +342,9 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-           #$Env:CXX = "ccache cl"
+           $Env:CXX = "ccache cl
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
-           nmake -f scintilla.mak -D"CXX=ccache cl"
+           nmake -f scintilla.mak
 
     - name: build lexilla
       working-directory: lexilla/src/
@@ -335,6 +353,14 @@ jobs:
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
            nmake -f lexilla.mak
 
+    - name: (cache) Save Ccache and SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          D:\.cache\ccache
+        key: cmake
+      
     - name: generate cmake
       working-directory: PowerEditor/src
       run: |
