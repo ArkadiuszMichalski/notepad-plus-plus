@@ -324,12 +324,16 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-           nmake -f scintilla.mak -DCXX='ccache cl' -DCCACHE_DIR=D:\.cache\ccache\scilex
+           $Env:CXX = "ccache cl"
+           $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
+           nmake -f scintilla.mak
 
     - name: build lexilla
       working-directory: lexilla/src/
       run: |
-           nmake -f lexilla.mak -DCXX='ccache cl' -DCCACHE_DIR=D:\.cache\ccache\scilex
+           $Env:CXX = "ccache cl"
+           $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
+           nmake -f lexilla.mak
 
     - name: generate cmake
       working-directory: PowerEditor/src
