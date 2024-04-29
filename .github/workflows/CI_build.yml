@@ -497,7 +497,7 @@ jobs:
         }
         mingw32-make -f PowerEditor\gcc\makefile
         
-        $Env:CCACHE_DIR = "D:\.cache\ccache"
+        $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
         Write-Output (ccache -s -v -v)
 
         #$Env:CCACHE_DIR = "D:\.cache\ccache"
