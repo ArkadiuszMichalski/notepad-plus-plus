@@ -338,6 +338,18 @@ jobs:
     - name: generate cmake
       working-directory: PowerEditor/src
       run: |
+
+          if (1) {
+          Write-Output (ccache -s)
+          Write-Output "========="
+          Write-Output (ccache -p)
+  
+          Write-Output "========="
+          Write-Output (Get-ChildItem -Path D:\.cache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+
+          exit 1
+          }
+      
            mkdir _build
            cd _build
            cmake -G "Visual Studio 17 2022" -A ${{ matrix.build_platform }} -T "v143" ..
