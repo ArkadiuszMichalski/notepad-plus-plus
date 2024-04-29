@@ -230,7 +230,7 @@ jobs:
              python -m pip install requests rfc3987 pywin32 lxml
            }
            python PowerEditor\Test\xmlValidator\validator_xml.py
-
+ 
     - name: Run FunctionList and UrlDetection Tests for Win32 / Debug only
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug'
       working-directory: .\
