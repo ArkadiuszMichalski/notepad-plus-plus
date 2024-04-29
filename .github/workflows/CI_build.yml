@@ -343,6 +343,7 @@ jobs:
       working-directory: scintilla/win32/
       run: |
            $Env:CXX = "ccache cl"
+           $Env:CC = "ccache cl"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
            nmake -f scintilla.mak
 
