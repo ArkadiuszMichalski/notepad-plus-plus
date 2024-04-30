@@ -346,6 +346,9 @@ jobs:
            $Env:CXX = "ccache.exe cl.exe"
            $Env:CC = "ccache.exe cl.exe"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
+
+           $Env:CXXFLAGS="-EHsc-std:c++17 -utf-8"
+           
            $Env:Path = 'D:\.cache\ccache\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV
            
            #"%~dp0\ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
@@ -355,6 +358,8 @@ jobs:
            $newContent | Set-Content -Path 'scintilla.mak'
 
            nmake -f scintilla.mak
+
+           exit 1
 
     - name: build lexilla
       working-directory: lexilla/src/
@@ -367,7 +372,7 @@ jobs:
            
            nmake -f lexilla.mak
            
-            if (0) {
+            if (1) {
             Write-Output (ccache -s -v -v)
             Write-Output "========="
             Write-Output (ccache -p)
