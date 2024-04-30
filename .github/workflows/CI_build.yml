@@ -347,7 +347,6 @@ jobs:
            "%~dp0\ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
            
            nmake -f scintilla.mak
-           exit 1
 
     - name: build lexilla
       working-directory: lexilla/src/
