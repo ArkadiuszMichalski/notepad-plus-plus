@@ -353,11 +353,8 @@ jobs:
            $content = Get-Content -Path 'scintilla.mak'
            $newContent = $content -replace '::', ':'
            $newContent | Set-Content -Path 'scintilla.mak'
-           
+
            nmake -f scintilla.mak
-
-           exit 1
-
 
     - name: build lexilla
       working-directory: lexilla/src/
