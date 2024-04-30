@@ -340,11 +340,11 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-           #$Env:CXX = "cl.bat"
-           #$Env:CC = "cl.bat"
+           $Env:CXX = "D:\.cache\ccache\bin\cl.bat"
+           $Env:CC = "D:\.cache\ccache\bin\cl.bat"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
            $Env:Path = 'D:\.cache\ccache\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV
-           "ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
+           "%~dp0\ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
            
            nmake -f scintilla.mak
            exit 1
