@@ -359,7 +359,7 @@ jobs:
     - name: build lexilla
       working-directory: lexilla/src/
       run: |
-           #$Env:CXX = "ccache cl"
+           $Env:CXX = "ccache cl"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
            $content = Get-Content -Path 'lexilla.mak'
            $newContent = $content -replace '::', ':'
