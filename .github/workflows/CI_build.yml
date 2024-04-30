@@ -340,13 +340,24 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-           $Env:CXX = "D:\.cache\ccache\bin\cl.bat"
-           $Env:CC = "D:\.cache\ccache\bin\cl.bat"
+           #$Env:CXX = "D:\.cache\ccache\bin\cl.bat"
+           #$Env:CC = "D:\.cache\ccache\bin\cl.bat"
+           
+           $Env:CXX = "ccache.exe cl.exe"
+           $Env:CC = "ccache.exe cl.exe"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
            $Env:Path = 'D:\.cache\ccache\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV
-           "%~dp0\ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
+           
+           #"%~dp0\ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
+
+           $content = Get-Content -Path 'lexilla.mak'
+           $newContent = $content -replace -replace '::', ':'
+           $newContent | Set-Content -Path 'lexilla.mak'
            
            nmake -f scintilla.mak
+
+           exit 1
+
 
     - name: build lexilla
       working-directory: lexilla/src/
