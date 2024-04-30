@@ -344,6 +344,13 @@ jobs:
            $Env:CC = "ccache cl"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
            $Env:Path = 'D:\.cache\ccache\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV
+           "ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat  
+
+           Write-Output(where cl)
+           Write-Output(where cl.bat)
+           Exit 1
+
+           
            nmake -f scintilla.mak
 
     - name: build lexilla
