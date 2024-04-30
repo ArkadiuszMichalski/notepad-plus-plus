@@ -350,9 +350,9 @@ jobs:
            
            #"%~dp0\ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
 
-           $content = Get-Content -Path 'lexilla\src\lexilla.mak'
+           $content = Get-Content -Path 'scintilla.mak'
            $newContent = $content -replace '::', ':'
-           $newContent | Set-Content -Path 'lexilla\src\lexilla.mak'
+           $newContent | Set-Content -Path 'scintilla.mak'
            
            nmake -f scintilla.mak
 
@@ -364,6 +364,10 @@ jobs:
       run: |
            #$Env:CXX = "ccache cl"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
+           $content = Get-Content -Path 'lexilla.mak'
+           $newContent = $content -replace '::', ':'
+           $newContent | Set-Content -Path 'lexilla.mak'
+           
            nmake -f lexilla.mak
            
             if (1) {
