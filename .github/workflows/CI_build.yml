@@ -340,24 +340,20 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-           $Env:CXX = "ccache cl"
-           $Env:CC = "ccache cl"
+           #$Env:CXX = "ccache cl"
+           #$Env:CC = "ccache cl"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
            $Env:Path = 'D:\.cache\ccache\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV
            "ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
-           #nmake -f scintilla.mak
+           
+           nmake -f scintilla.mak
 
     - name: build lexilla
       working-directory: lexilla/src/
       run: |
-           $Env:CXX = "ccache cl"
+           #$Env:CXX = "ccache cl"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
-           
-           Write-Output(where.exe cl)
-           Write-Output(where.exe cl.bat)
-           Exit 1
-           
-           #nmake -f lexilla.mak
+           nmake -f lexilla.mak
            
             if (1) {
             Write-Output (ccache -s -v -v)
