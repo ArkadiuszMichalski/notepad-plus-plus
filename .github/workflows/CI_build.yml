@@ -388,7 +388,7 @@ jobs:
            $newContent | Set-Content -Path 'lexilla.mak'
            
            nmake -f lexilla.mak
-           
+           exit 1
             if (0) {
             Write-Output (ccache -s -v -v)
             Write-Output "========="
