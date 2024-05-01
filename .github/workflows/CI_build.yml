@@ -390,8 +390,8 @@ jobs:
            $newContent | Set-Content -Path 'lexilla.mak'
            
            nmake -f lexilla.mak
-           exit 1
-            if (0) {
+           
+            if (1) {
             Write-Output (ccache -s -v -v)
             Write-Output "========="
             Write-Output (ccache -p)
@@ -401,6 +401,8 @@ jobs:
   
             exit 1
             }
+
+            exit 1
 
     - name: (cache) Save Ccache and SciLex files
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
