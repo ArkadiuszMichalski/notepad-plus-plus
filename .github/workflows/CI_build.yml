@@ -345,7 +345,7 @@ jobs:
            
            $Env:CXX = "ccache.exe cl.exe"
            $Env:CC = "ccache.exe cl.exe"
-           $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
+           $Env:CCACHE_DIR = "D:\.cache\ccache\sci"
 
            if (0) {
            $Env:CCACHE_DEBUG = 1
@@ -384,7 +384,7 @@ jobs:
       working-directory: lexilla/src/
       run: |
            $Env:CXX = "ccache cl"
-           $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
+           $Env:CCACHE_DIR = "D:\.cache\ccache\lex"
            $content = Get-Content -Path 'lexilla.mak'
            $newContent = $content -replace '::', ':' -replace '-Zi', '-Z7' -replace ' -MP', ''
            $newContent | Set-Content -Path 'lexilla.mak'
