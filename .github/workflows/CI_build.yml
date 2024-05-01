@@ -358,7 +358,7 @@ jobs:
            #"%~dp0\ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
 
            $content = Get-Content -Path 'scintilla.mak'
-           $newContent = $content -replace '::', ':'
+           $newContent = $content -replace '::', ':' -replace '-Zi', '-Z7'
            $newContent | Set-Content -Path 'scintilla.mak'
 
            nmake -f scintilla.mak
