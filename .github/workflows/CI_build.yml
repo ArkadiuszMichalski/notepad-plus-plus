@@ -399,7 +399,7 @@ jobs:
             Write-Output "========="
             Write-Output (Get-ChildItem -Path D:\.cache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
   
-            exit 1
+            #exit 1
             }
 
             #exit 1
