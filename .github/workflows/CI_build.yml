@@ -350,6 +350,8 @@ jobs:
            $Env:CCACHE_DEBUG = 1
            $Env:CCACHE_DEBUGDIR = "D:\.cache\ccache\scilex"
            $Env:CCACHE_LOGFILE = "D:\.cache\ccache\scilex\log.txt"
+           "" | Out-File D:\.cache\ccache\scilex\log.txt
+           
 
            $Env:Path = 'D:\.cache\ccache\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV
            
