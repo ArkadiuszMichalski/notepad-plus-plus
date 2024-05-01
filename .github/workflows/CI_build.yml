@@ -346,13 +346,15 @@ jobs:
            $Env:CXX = "ccache.exe cl.exe"
            $Env:CC = "ccache.exe cl.exe"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
- 
+
+           if (0) {
            $Env:CCACHE_DEBUG = 1
            $Env:CCACHE_DEBUGDIR = "D:\"
            $Env:CCACHE_LOGFILE = "D:\log.txt"
            "" | Out-File D:\log.txt
+           }
            
-
+ 
            $Env:Path = 'D:\.cache\ccache\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV
            
            #"%~dp0\ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
