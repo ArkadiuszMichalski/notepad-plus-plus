@@ -346,7 +346,7 @@ jobs:
            $Env:CXX = "ccache.exe cl.exe"
            $Env:CC = "ccache.exe cl.exe"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
-
+ 
            $Env:CCACHE_DEBUG = 1
            $Env:CCACHE_DEBUGDIR = "D:\"
            $Env:CCACHE_LOGFILE = "D:\log.txt"
