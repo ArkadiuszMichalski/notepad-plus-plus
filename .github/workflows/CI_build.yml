@@ -343,8 +343,8 @@ jobs:
            #$Env:CXX = "D:\.cache\ccache\bin\cl.bat"
            #$Env:CC = "D:\.cache\ccache\bin\cl.bat"
            
-           $Env:CXX = "ccache.exe cl.exe"
-           $Env:CC = "ccache.exe cl.exe"
+           #$Env:CXX = "ccache.exe cl.exe"
+           #$Env:CC = "ccache.exe cl.exe"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
 
            if (0) {
@@ -359,9 +359,9 @@ jobs:
            
            #"%~dp0\ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
 
-           $content = Get-Content -Path 'scintilla.mak'
-           $newContent = $content -replace '::', ':' -replace '-Zi', '-Z7'
-           $newContent | Set-Content -Path 'scintilla.mak'
+           #$content = Get-Content -Path 'scintilla.mak'
+           #$newContent = $content -replace '::', ':' -replace '-Zi', '-Z7'
+           #$newContent | Set-Content -Path 'scintilla.mak'
 
            nmake -f scintilla.mak
 
@@ -383,11 +383,11 @@ jobs:
     - name: build lexilla
       working-directory: lexilla/src/
       run: |
-           $Env:CXX = "ccache cl"
-           $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
-           $content = Get-Content -Path 'lexilla.mak'
-           $newContent = $content -replace '::', ':' -replace '-Zi', '-Z7'
-           $newContent | Set-Content -Path 'lexilla.mak'
+           #$Env:CXX = "ccache cl"
+           #$Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
+           #$content = Get-Content -Path 'lexilla.mak'
+           #$newContent = $content -replace '::', ':' -replace '-Zi', '-Z7'
+           #$newContent | Set-Content -Path 'lexilla.mak'
            
            nmake -f lexilla.mak
            exit 1
