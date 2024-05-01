@@ -363,7 +363,7 @@ jobs:
 
            nmake -f scintilla.mak
 
-           if (1) {
+           if (0) {
             Write-Output (ccache -s -v -v)
             Write-Output "========="
             Write-Output (ccache -p)
@@ -384,12 +384,12 @@ jobs:
            $Env:CXX = "ccache cl"
            $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
            $content = Get-Content -Path 'lexilla.mak'
-           $newContent = $content -replace '::', ':'
+           $newContent = $content -replace '::', ':' -replace '-Zi', '-Z7'
            $newContent | Set-Content -Path 'lexilla.mak'
            
            nmake -f lexilla.mak
            
-            if (1) {
+            if (0) {
             Write-Output (ccache -s -v -v)
             Write-Output "========="
             Write-Output (ccache -p)
