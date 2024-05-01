@@ -391,7 +391,7 @@ jobs:
            
            nmake -f lexilla.mak
            
-            if (1) {
+            if (0) {
             Write-Output (ccache -s -v -v)
             Write-Output "========="
             Write-Output (ccache -p)
