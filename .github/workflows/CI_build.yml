@@ -281,7 +281,7 @@ jobs:
       # working-directory: PowerEditor\visual.net\
       # run: msbuild notepadPlus.sln /m /p:configuration="${{ matrix.build_configuration }}" /p:platform="${{ matrix.build_platform }}" /p:PlatformToolset="ClangCL"
 
-
+ 
   build_windows_cmake:
  
     runs-on: windows-latest
