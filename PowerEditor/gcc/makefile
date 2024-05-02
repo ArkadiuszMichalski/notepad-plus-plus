@@ -199,15 +199,13 @@ RC_TARGETS := $(patsubst %.rc,$(BUILD_DIRECTORY)/%.res,$(sort $(filter %.rc,$(GC
 # actions
 #
 
-.PHONY: .force all BUILD_DIRECTORY binary data clean sciclean lexclean fullclean
+.PHONY: .force all binary data clean sciclean lexclean fullclean
 .force:
 
 SUBMAKEFLAGS += $(if $(NUMBER_OF_PROCESSORS),-j$(NUMBER_OF_PROCESSORS),)
 
 all: $(SCINTILLA_TARGET) $(LEXILLA_TARGET)
 	$(AT)$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(SUBMAKEFLAGS) binary
-
-BUILD_DIRECTORY: $(BUILD_DIRECTORY)
 
 $(BUILD_DIRECTORY):
 	@echo + creating BUILD_DIRECTORY $@
