@@ -319,10 +319,9 @@ jobs:
       id: cmake
       run: |
         if ($${{ contains(needs.before_build.outputs.title, '[force noscilexcache]') }}) {
-          $env:SCILEX_CMAKE_ALLOW_CACHE = "false"
           Write-Output "SCILEX_CMAKE_ALLOW_CACHE=false" >> $env:GITHUB_ENV
         }
-        if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true") { 
+        else { 
           $cl_num = (cl /?) 2>&1 | Select-String -Pattern 'Version (.*) for' | %{$_.Matches.Groups[1].value}
           $nmake_num = (nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
           $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
@@ -351,94 +350,28 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-           #$Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
-           #Write-Output (pwd).path
-           #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
-            exit 1
-            if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
-              $Now = Get-Date
-              Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-              Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
-            }
-
-           nmake -f scintilla.mak
-           
-           
-           #Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
- 
-           #$Env:CXX = "D:\.cache\ccache\bin\cl.bat"
-           #$Env:CC = "D:\.cache\ccache\bin\cl.bat"
-           
-           #$Env:CXX = "ccache.exe cl.exe"
-           #$Env:CC = "ccache.exe cl.exe"
-           #$Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
-
-           if (0) {
-           $Env:CCACHE_DEBUG = 1
-           $Env:CCACHE_DEBUGDIR = "D:\"
-           $Env:CCACHE_LOGFILE = "D:\log.txt"
-           "" | Out-File D:\log.txt
-           }
-           
-  
-           #$Env:Path = 'D:\.cache\ccache\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV
-           
-           #"%~dp0\ccache.exe cl.exe %*" | Out-File D:\.cache\ccache\bin\cl.bat   
-
-           #$content = Get-Content -Path 'scintilla.mak'
-           #$newContent = $content -replace '::', ':' -replace '-Zi', '-Z7'
-           #$newContent | Set-Content -Path 'scintilla.mak'
-
-           #nmake -f scintilla.mak
-
-           if (0) {
-            Write-Output (ccache -s -v -v)
-            Write-Output "========="
-            Write-Output (ccache -p)
-    
-            Write-Output "========="
-            Write-Output (Get-ChildItem -Path D:\.cache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-
-            Write-Output "========="
-            Write-Output (Get-Content -Path D:\log.txt)
-            
-  
-            exit 1
-           }
+        #$Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
+        #Write-Output (pwd).path
+        #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
+        if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
+          $Now = Get-Date
+          Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
+          Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
+        }
+        nmake -f scintilla.mak
+        #Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
 
     - name: build lexilla
       working-directory: lexilla/src/
-      run: |
-           #$Env:CXX = "ccache cl"
-           #$Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
-           #$content = Get-Content -Path 'lexilla.mak'
-           #$newContent = $content -replace '::', ':' -replace '-Zi', '-Z7'
-           #$newContent | Set-Content -Path 'lexilla.mak'
-
+      run: |  
+        if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
+          $Now = Get-Date
+          Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
+          Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
+        }
+        nmake -f lexilla.mak    
+        #Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
            
-            if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
-              $Now = Get-Date
-              Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-              Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
-            }
-            
-           nmake -f lexilla.mak
-           
-           #Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-           
-            if (0) {
-            Write-Output (ccache -s -v -v)
-            Write-Output "========="
-            Write-Output (ccache -p)
-    
-            Write-Output "========="
-            Write-Output (Get-ChildItem -Path D:\.cache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-  
-            #exit 1
-            }
-
-            #exit 1
-
     - name: (cache) Save SciLex files
       if: env.SCILEX_CMAKE_ALLOW_CACHE == 'true' && steps.cache-restore.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
@@ -453,7 +386,6 @@ jobs:
     - name: generate cmake
       working-directory: PowerEditor/src
       run: | 
-           exit 1
            mkdir _build
            cd _build
            cmake -G "Visual Studio 17 2022" -A ${{ matrix.build_platform }} -T "v143" ..
