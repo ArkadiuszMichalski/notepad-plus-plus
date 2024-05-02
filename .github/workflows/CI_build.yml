@@ -495,7 +495,7 @@ jobs:
   
           Write-Output "key=$key" >> $env:GITHUB_OUTPUT
 
-          mingw32-make -f PowerEditor\gcc\makefile BUILD_DIRECTORY
+          mingw32-make -f PowerEditor\gcc\makefile $(BUILD_DIRECTORY)
         }
      
     - name: (cache) Lookup Ccache and SciLex files
