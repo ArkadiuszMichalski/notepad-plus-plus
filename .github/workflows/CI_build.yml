@@ -514,7 +514,6 @@ jobs:
 
     - name: (cache) Prepare build directory
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
-      with:
        run: |
           $content = Get-Content -Path 'PowerEditor\gcc\makefile'
           #$newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\.cache\ccache\scilex" DIR_O'
