@@ -502,10 +502,10 @@ jobs:
       id: cache-lookup
       with:
         path: |
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_lexilla.build
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_scintilla.build
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\liblexilla.a
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\libscintilla.a
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a
           
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
@@ -515,10 +515,10 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_lexilla.build
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_scintilla.build
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\liblexilla.a
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\libscintilla.a
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a
         key: ${{ steps.msys2.outputs.key }}
  
     - name: (cache) Install Ccache
@@ -545,10 +545,10 @@ jobs:
           #$newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
 
           $Now = Get-Date; 
-          Get-ChildItem -Path PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_lexilla.build -File | ForEach-Object { $_.LastWriteTime = $Now }
-          Get-ChildItem -Path PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_scintilla.build -File | ForEach-Object { $_.LastWriteTime = $Now }
-          (Get-ChildItem PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\liblexilla.a).LastWriteTime = $Now
-          (Get-ChildItem PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\libscintilla.a).LastWriteTime = $Now
+          Get-ChildItem -Path PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build -File | ForEach-Object { $_.LastWriteTime = $Now }
+          Get-ChildItem -Path PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build -File | ForEach-Object { $_.LastWriteTime = $Now }
+          (Get-ChildItem PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a).LastWriteTime = $Now
+          (Get-ChildItem PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a).LastWriteTime = $Now
   
         }
         #mingw32-make -f PowerEditor\gcc\makefile
@@ -594,8 +594,8 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_lexilla.build
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_scintilla.build
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\liblexilla.a
-          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\libscintilla.a
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a
         key: ${{ steps.msys2.outputs.key }}
