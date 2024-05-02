@@ -321,6 +321,7 @@ jobs:
         path: |
           lexilla\bin
           scintilla\bin
+          scintilla\win32
         key: cmake
         lookup-only: true
 
@@ -331,14 +332,17 @@ jobs:
         path: |
           lexilla\bin
           scintilla\bin
+          scintilla\win32
         key: cmake
  
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-           $Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
-           Write-Output (pwd)
-           nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
+           #$Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
+           Write-Output (pwd).path
+           #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
+
+           nmake -f scintilla.mak
            Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
            exit 1
 
@@ -413,6 +417,7 @@ jobs:
         path: |
           lexilla\bin
           scintilla\bin
+          scintilla\win32
         key: cmake
       
     - name: generate cmake
