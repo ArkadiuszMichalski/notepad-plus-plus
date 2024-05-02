@@ -555,7 +555,7 @@ jobs:
   
         }
         #mingw32-make -f PowerEditor\gcc\makefile
-        #Write-Output (Get-ChildItem -Path D:\ -Recurse -Directory -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output (Get-ChildItem -Path D:\ -Recurse -Directory -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         
         #$Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
         #Write-Output (ccache -s -v -v)
