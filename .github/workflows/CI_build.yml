@@ -317,16 +317,11 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        #((nmake /?) ((nmake /?) 2>&1 | Out-String)
         $nmake_num = (nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
+        $cl_num = (cl /?)
 
-        Write-Output $nmake_num
-        #Write-Output ((((nmake /?) | Out-String) -split '[\r\n]+')[0] | Select-String -Pattern 'Version (.*)Copyright' | %{$_.Matches.Groups[1].value})
-        
+        Write-Output  $cl_num
 
- 
-
-        
         #$gcc_num = (gcc --version) | select-object -first 1 | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
         #$make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
         #$hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
