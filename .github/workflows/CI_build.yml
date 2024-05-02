@@ -317,22 +317,17 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
+        $cl_num = (cl /?) 2>&1 | Select-String -Pattern 'Version (.*) for' | %{$_.Matches.Groups[1].value}
         $nmake_num = (nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
-        $cl_num = (cl /?)| Select-String -Pattern 'Version (.*) for' | %{$_.Matches.Groups[1].value}
-
-        Write-Output  $cl_num
-
-        #$gcc_num = (gcc --version) | select-object -first 1 | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
-        #$make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
-        #$hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
-        #$key = "${{ runner.os }}-SCILEX-CMAKE-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-HASH_$hash"
+        hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
+        $key = "${{ runner.os }}-SCILEX-CMAKE-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-CL_$cl_num-NMAKE_$nmake_num-HASH_$hash"
       
-        #Write-Output $gcc_num
-        #Write-Output $make_num
+        #Write-Output $cl_num
+        #Write-Output $nmake_num
         #Write-Output $hash
-        #Write-Output $key
+        Write-Output $key
   
-        #Write-Output "key=$key" >> $env:GITHUB_OUTPUT
+        Write-Output "key=$key" >> $env:GITHUB_OUTPUT
 
     - name: Archive artifacts
       uses: actions/upload-artifact@v4
