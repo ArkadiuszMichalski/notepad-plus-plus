@@ -336,16 +336,10 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-            nmake -f scintilla.mak DIR_O=..\bin
-            Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-            exit 1
+           nmake -f scintilla.mak DIR_O=..\bin
+           Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+           exit 1
 
-            
-
-
-
-
-      
            #$Env:CXX = "D:\.cache\ccache\bin\cl.bat"
            #$Env:CC = "D:\.cache\ccache\bin\cl.bat"
            
