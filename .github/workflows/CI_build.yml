@@ -318,7 +318,7 @@ jobs:
       id: cmake
       run: |
         $nmake_num = (nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
-        $cl_num = (cl /?)
+        $cl_num = (cl /?)| Select-String -Pattern 'Version (.*) for' | %{$_.Matches.Groups[1].value}
 
         Write-Output  $cl_num
 
