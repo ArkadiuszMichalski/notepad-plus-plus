@@ -317,8 +317,8 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        $nmake_num = (((cmd.exe /c "nmake /?") -split 'Version')[0])
-
+        (nmake /?) > 'nmake.ver'
+        $nmake_num = (Get-Content 'nmake.ver' | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value})
 
         Write-Output $nmake_num
         #Write-Output ((((nmake /?) | Out-String) -split '[\r\n]+')[0] | Select-String -Pattern 'Version (.*)Copyright' | %{$_.Matches.Groups[1].value})
