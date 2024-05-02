@@ -552,7 +552,7 @@ jobs:
           (Get-ChildItem bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a).LastWriteTime = $Now
   
         }
-        #mingw32-make -f PowerEditor\gcc\makefile BUILD_DIRECTORY
+        mingw32-make -f PowerEditor\gcc\makefile BUILD_DIRECTORY
         Write-Output (Get-ChildItem -Path D:\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         
         #$Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
