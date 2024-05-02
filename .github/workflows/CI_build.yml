@@ -319,7 +319,7 @@ jobs:
       run: |
         $cl_num = (cl /?) 2>&1 | Select-String -Pattern 'Version (.*) for' | %{$_.Matches.Groups[1].value}
         $nmake_num = (nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
-        hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
+        $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
         $key = "${{ runner.os }}-SCILEX-CMAKE-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-CL_$cl_num-NMAKE_$nmake_num-HASH_$hash"
       
         #Write-Output $cl_num
@@ -328,12 +328,6 @@ jobs:
         Write-Output $key
   
         Write-Output "key=$key" >> $env:GITHUB_OUTPUT
-
-    - name: Archive artifacts
-      uses: actions/upload-artifact@v4
-      with:
-          name: nmake.txt
-          path: nmake.txt
 
     - name: (cache) Restore SciLex files
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
@@ -345,7 +339,7 @@ jobs:
           lexilla\src
           scintilla\bin
           scintilla\win32
-        key: cmake
+        key: ${{ steps.cmake.outputs.key }} 
   
     - name: build scintilla
       working-directory: scintilla/win32/
@@ -447,7 +441,7 @@ jobs:
           lexilla\src
           scintilla\bin
           scintilla\win32
-        key: cmake
+        key: ${{ steps.cmake.outputs.key }} 
       
     - name: generate cmake
       working-directory: PowerEditor/src
