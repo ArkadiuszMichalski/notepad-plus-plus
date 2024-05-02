@@ -317,7 +317,7 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        $nmake_num = ((nmake /?) -split '[\r\n]+')[0] | select-object -first 1
+        #$nmake_num = ((nmake /?) -split '[\r\n]+')[0] | select-object -first 1
 
         $command = "nmake /?"
         
