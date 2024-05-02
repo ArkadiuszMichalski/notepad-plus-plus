@@ -494,8 +494,6 @@ jobs:
           Write-Output $key
   
           Write-Output "key=$key" >> $env:GITHUB_OUTPUT
-
-          mingw32-make -f PowerEditor\gcc\makefile BUILD_DIRECTORY
         }
      
     - name: (cache) Lookup Ccache and SciLex files
@@ -515,10 +513,9 @@ jobs:
     - name: (cache) Prepare build directory
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
       run: |
-       $content = Get-Content -Path 'PowerEditor\gcc\makefile'
-       #$newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\.cache\ccache\scilex" DIR_O'
-       #$newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
-    
+       Add-Content -Path 'PowerEditor\gcc\makefile' -Value 'BUILD_DIRECTORY : $(BUILD_DIRECTORY)'
+       mingw32-make -f PowerEditor\gcc\makefile BUILD_DIRECTORY
+
     - name: (cache) Restore Ccache and SciLex files
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
       uses: actions/cache/restore@v4
