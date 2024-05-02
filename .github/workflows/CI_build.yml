@@ -346,7 +346,7 @@ jobs:
 
             if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-lookup.outputs.cache-hit == 'true' }}) {
               $Now = Get-Date
-              Get-ChildItem -Path scintilla\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
+              Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
               Get-ChildItem -Path scintilla\win32 -File | ForEach-Object { $_.LastWriteTime = $Now }
             }
 
