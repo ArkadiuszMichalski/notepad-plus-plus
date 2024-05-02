@@ -336,7 +336,8 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-           nmake -f scintilla.mak DIR_O=..\bin
+           $Env:DIR_O = "..\bin"
+           nmake -f scintilla.mak
            Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
            exit 1
 
