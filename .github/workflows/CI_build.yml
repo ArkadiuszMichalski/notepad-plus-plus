@@ -317,17 +317,11 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        #$nmake_num = ((nmake /?) -split '[\r\n]+')[0] | select-object -first 1
+        #$nmake_num = ((bash -lc "nmake /?") -split 'Version')[0] 
 
-        $command = "nmake /?"
-        
-        Invoke-Expression $command -OutVariable output -ErrorVariable errors
-        Write-Host "STDOUT"
-        Write-Host $output
-        Write-Host "STDERR"
-        Write-Host $errors
 
-        #Write-Output $nmake_num
+
+        Write-Output $nmake_num
         #Write-Output ((((nmake /?) | Out-String) -split '[\r\n]+')[0] | Select-String -Pattern 'Version (.*)Copyright' | %{$_.Matches.Groups[1].value})
         
 
