@@ -298,5 +298,3 @@ fullclean: clean
 	-$(AT)$(RMDIR) $(call normalize-path,$(TARGET_DIRECTORY))
 
 -include $(CXX_TARGETS:%.o=%.d)
-
-BUILD_DIRECTORY : $(BUILD_DIRECTORY)
