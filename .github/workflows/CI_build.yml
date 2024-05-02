@@ -317,13 +317,13 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        $nmake_num = ((nmake /?) -split '[\r\n]+')[0]
+        $nmake_num = (((nmake /?) -split '[\r\n]+')[0] -split 'Maintenance')[1]
 
         Write-Output $nmake_num
         #Write-Output ((((nmake /?) | Out-String) -split '[\r\n]+')[0] | Select-String -Pattern 'Version (.*)Copyright' | %{$_.Matches.Groups[1].value})
         
 
-        exit 1
+ 
 
         
         #$gcc_num = (gcc --version) | select-object -first 1 | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
@@ -356,7 +356,7 @@ jobs:
            #$Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
            #Write-Output (pwd).path
            #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
-
+            exit 1
             if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
               $Now = Get-Date
               Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
