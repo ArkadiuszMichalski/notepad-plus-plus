@@ -4,6 +4,7 @@ on: [push, pull_request]
 env:
   PYTHON_ALLOW_CACHE: true
   PYTHON_DIR_CACHE: D:\.cache\python
+  SCILEX_CMAKE_ALLOW_CACHE: true
   SCILEX_MSYS2_ALLOW_CACHE: true
   MSYS2_ALLOW_UPDATE: true 
       
@@ -314,23 +315,29 @@ jobs:
         arch: ${{ matrix.arch }}
 
     - name: (cache) Prepare cache info
-      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
+      if: env.SCILEX_CMAKE_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        $cl_num = (cl /?) 2>&1 | Select-String -Pattern 'Version (.*) for' | %{$_.Matches.Groups[1].value}
-        $nmake_num = (nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
-        $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
-        $key = "${{ runner.os }}-SCILEX-CMAKE-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-CL_$cl_num-NMAKE_$nmake_num-HASH_$hash"
-      
-        #Write-Output $cl_num
-        #Write-Output $nmake_num
-        #Write-Output $hash
-        Write-Output $key
-  
-        Write-Output "key=$key" >> $env:GITHUB_OUTPUT
+        if ($${{ contains(needs.before_build.outputs.title, '[force noscilexcache]') }}) {
+          $env:SCILEX_CMAKE_ALLOW_CACHE = "false"
+          Write-Output "SCILEX_CMAKE_ALLOW_CACHE=false" >> $env:GITHUB_ENV
+        }
+        if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true") { 
+          $cl_num = (cl /?) 2>&1 | Select-String -Pattern 'Version (.*) for' | %{$_.Matches.Groups[1].value}
+          $nmake_num = (nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
+          $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
+          $key = "${{ runner.os }}-SCILEX-CMAKE-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-CL_$cl_num-NMAKE_$nmake_num-HASH_$hash"
+        
+          Write-Output $cl_num
+          Write-Output $nmake_num
+          Write-Output $hash
+          Write-Output $key
+    
+          Write-Output "key=$key" >> $env:GITHUB_OUTPUT
+        }
 
     - name: (cache) Restore SciLex files
-      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
+      if: env.SCILEX_CMAKE_ALLOW_CACHE == 'true'
       uses: actions/cache/restore@v4
       id: cache-restore
       with:
@@ -348,7 +355,7 @@ jobs:
            #Write-Output (pwd).path
            #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
             exit 1
-            if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
+            if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
               $Now = Get-Date
               Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
               Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
@@ -409,7 +416,7 @@ jobs:
            #$newContent | Set-Content -Path 'lexilla.mak'
 
            
-            if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
+            if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
               $Now = Get-Date
               Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
               Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
@@ -433,7 +440,7 @@ jobs:
             #exit 1
 
     - name: (cache) Save SciLex files
-      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-restore.outputs.cache-hit != 'true' && github.event_name == 'push'
+      if: env.SCILEX_CMAKE_ALLOW_CACHE == 'true' && steps.cache-restore.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
       with:
         path: |
@@ -482,7 +489,6 @@ jobs:
            $newContent | Set-Content -Path 'resource.h'
  
     - name: Setup MSYS2 and prepare cache info
-      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: msys2
       run: |   
         $Env:Path = 'C:\msys64\usr\bin' + [IO.Path]::PathSeparator + $Env:Path
