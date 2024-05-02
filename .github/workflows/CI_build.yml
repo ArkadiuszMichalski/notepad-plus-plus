@@ -317,9 +317,12 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        Write-Output (nmake /?)
-        Write-Output "${{ matrix.build_platform }}"
-        Write-Output "${{ matrix.build_configuration }}"
+        $nmake_num = (nmake /?) | select-object -first 1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
+
+        Write-Output $nmake_num
+        
+
+        exit 1
 
         
         #$gcc_num = (gcc --version) | select-object -first 1 | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
