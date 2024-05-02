@@ -286,7 +286,7 @@ jobs:
  
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == '' && 1
+    if: needs.before_build.outputs.result == '' && 0
     strategy:
       matrix:
         include:
@@ -430,7 +430,7 @@ jobs:
 
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == '' && 0
+    if: needs.before_build.outputs.result == '' && 1
     strategy:
       fail-fast: false
       #build_platform: [x86_64, i686]
@@ -502,7 +502,11 @@ jobs:
       id: cache-lookup
       with:
         path: |
-          D:\.cache\ccache
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_lexilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_scintilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\liblexilla.a
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\libscintilla.a
+          
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
         
@@ -511,11 +515,14 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          D:\.cache\ccache
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_lexilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_scintilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\liblexilla.a
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\libscintilla.a
         key: ${{ steps.msys2.outputs.key }}
  
     - name: (cache) Install Ccache
-      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true'
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && 0
       run: |
         $ccache_num = (Invoke-RestMethod https://github.com/ccache/ccache/releases/latest) | Select-String 'download.*ccache-(.*)-windows-${{ matrix.build_platform }}' | %{$_.Matches.Groups[1].value}
         Invoke-WebRequest https://github.com/ccache/ccache/releases/download/v$ccache_num/ccache-$ccache_num-windows-${{ matrix.build_platform }}.zip -OutFile D:\ccache.zip
@@ -531,12 +538,20 @@ jobs:
         Write-Output (mingw32-make --version) | select-object -first 1
         Write-Output (sh --version) | select-object -first 1
         if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and (Test-Path -Path D:\.cache\ccache)) {
-          Write-Output (ccache --version) | select-object -first 1
-          $content = Get-Content -Path 'PowerEditor\gcc\makefile'
-          $newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\.cache\ccache\scilex" DIR_O'
-          $newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
+          
+          #Write-Output (ccache --version) | select-object -first 1
+          #$content = Get-Content -Path 'PowerEditor\gcc\makefile'
+          #$newContent = $content -replace 'DIR_O', 'CXX="ccache g++" CCACHE_DIR="D:\.cache\ccache\scilex" DIR_O'
+          #$newContent | Set-Content -Path 'PowerEditor\gcc\makefile'
+
+          $Now = Get-Date; 
+          Get-ChildItem -Path PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_lexilla.build -File | ForEach-Object { $_.LastWriteTime = $Now }
+          Get-ChildItem -Path PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_scintilla.build -File | ForEach-Object { $_.LastWriteTime = $Now }
+          (Get-ChildItem PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\liblexilla.a).LastWriteTime = $Now
+          (Get-ChildItem PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\libscintilla.a).LastWriteTime = $Now
+  
         }
-        mingw32-make -f PowerEditor\gcc\makefile
+        #mingw32-make -f PowerEditor\gcc\makefile
         
         #$Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
         #Write-Output (ccache -s -v -v)
@@ -579,5 +594,8 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
-          D:\.cache\ccache
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_lexilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\_scintilla.build
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\liblexilla.a
+          PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || ''}.build\libscintilla.a
         key: ${{ steps.msys2.outputs.key }}
