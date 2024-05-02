@@ -317,10 +317,10 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        (nmake /?) > 'nmake.txt'
-        $nmake_num = (((Get-Content 'nmake.txt' -First 1) -split '[\r\n]+')[1])
+        ((nmake /?) | Out-String) > 'nmake.txt'
+        #$nmake_num = (((Get-Content 'nmake.txt' -First 1) -split '[\r\n]+')[1])
 
-        Write-Output $nmake_num
+        #Write-Output $nmake_num
         #Write-Output ((((nmake /?) | Out-String) -split '[\r\n]+')[0] | Select-String -Pattern 'Version (.*)Copyright' | %{$_.Matches.Groups[1].value})
         
 
