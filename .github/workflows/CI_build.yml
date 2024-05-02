@@ -317,11 +317,15 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        Write-Output (nmake --version)
+        Write-Output (nmake /?)
+        Write-Output "${{ matrix.build_platform }}"
+        Write-Output "${{ matrix.build_configuration }}"
+
+        
         #$gcc_num = (gcc --version) | select-object -first 1 | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
         #$make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
-        #$hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla', 'PowerEditor\gcc') }}"
-        #$key = "${{ runner.os }}-SCILEX-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-HASH_$hash"
+        #$hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
+        #$key = "${{ runner.os }}-SCILEX-CMAKE-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-HASH_$hash"
       
         #Write-Output $gcc_num
         #Write-Output $make_num
@@ -447,7 +451,7 @@ jobs:
     - name: generate cmake
       working-directory: PowerEditor/src
       run: | 
-           #exit 1
+           exit 1
            mkdir _build
            cd _build
            cmake -G "Visual Studio 17 2022" -A ${{ matrix.build_platform }} -T "v143" ..
