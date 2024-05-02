@@ -320,6 +320,7 @@ jobs:
       with:
         path: |
           lexilla\bin
+          lexilla\src
           scintilla\bin
           scintilla\win32
         key: cmake
@@ -331,6 +332,7 @@ jobs:
       with:
         path: |
           lexilla\bin
+          lexilla\src
           scintilla\bin
           scintilla\win32
         key: cmake
@@ -406,10 +408,12 @@ jobs:
             if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-lookup.outputs.cache-hit == 'true' }}) {
               $Now = Get-Date
               Get-ChildItem -Path lexilla\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
+              Get-ChildItem -Path lexilla\src -File | ForEach-Object { $_.LastWriteTime = $Now }
             }
-           #$Env:DIR_O = "..\bin"
-           nmake -f lexilla.mak DIR_O="..\bin"
-           Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+            
+           nmake -f lexilla.mak
+           
+           #Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
            
             if (0) {
             Write-Output (ccache -s -v -v)
@@ -430,6 +434,7 @@ jobs:
       with:
         path: |
           lexilla\bin
+          lexilla\src
           scintilla\bin
           scintilla\win32
         key: cmake
