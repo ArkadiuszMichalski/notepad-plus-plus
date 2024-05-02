@@ -494,6 +494,8 @@ jobs:
           Write-Output $key
   
           Write-Output "key=$key" >> $env:GITHUB_OUTPUT
+
+          mingw32-make -f PowerEditor\gcc\makefile BUILD_DIRECTORY
         }
      
     - name: (cache) Lookup Ccache and SciLex files
@@ -552,7 +554,6 @@ jobs:
           (Get-ChildItem bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a).LastWriteTime = $Now
   
         }
-        mingw32-make -f PowerEditor\gcc\makefile BUILD_DIRECTORY
         mingw32-make -f PowerEditor\gcc\makefile
         #Write-Output (Get-ChildItem -Path D:\ -Recurse -Directory -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         
