@@ -317,7 +317,7 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        ((nmake /?) 2>&1 | Out-String) > 'nmake.txt'
+        ((nmake /?) 3>&1 2>&1 > 'nmake.txt'
         #$nmake_num = (((Get-Content 'nmake.txt' -First 1) -split '[\r\n]+')[1])
 
         #Write-Output $nmake_num
