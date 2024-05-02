@@ -339,13 +339,20 @@ jobs:
       working-directory: scintilla/win32/
       run: |
            #$Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
-           Write-Output (pwd).path
+           #Write-Output (pwd).path
            #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
 
-           nmake -f scintilla.mak
-           Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-           exit 1
+            if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-lookup.outputs.cache-hit == 'true' }}) {
+              $Now = Get-Date
+              Get-ChildItem -Path scintilla\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
+              Get-ChildItem -Path scintilla\win32 -File | ForEach-Object { $_.LastWriteTime = $Now }
+            }
 
+           nmake -f scintilla.mak
+           
+           
+           #Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+ 
            #$Env:CXX = "D:\.cache\ccache\bin\cl.bat"
            #$Env:CC = "D:\.cache\ccache\bin\cl.bat"
            
@@ -389,13 +396,20 @@ jobs:
     - name: build lexilla
       working-directory: lexilla/src/
       run: |
-           $Env:CXX = "ccache cl"
-           $Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
-           $content = Get-Content -Path 'lexilla.mak'
-           $newContent = $content -replace '::', ':' -replace '-Zi', '-Z7'
-           $newContent | Set-Content -Path 'lexilla.mak'
+           #$Env:CXX = "ccache cl"
+           #$Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
+           #$content = Get-Content -Path 'lexilla.mak'
+           #$newContent = $content -replace '::', ':' -replace '-Zi', '-Z7'
+           #$newContent | Set-Content -Path 'lexilla.mak'
+
            
+            if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-lookup.outputs.cache-hit == 'true' }}) {
+              $Now = Get-Date
+              Get-ChildItem -Path lexilla\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
+            }
+           DIR_O = "..\bin"
            nmake -f lexilla.mak
+           Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
            
             if (0) {
             Write-Output (ccache -s -v -v)
