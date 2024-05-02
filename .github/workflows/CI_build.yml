@@ -320,7 +320,7 @@ jobs:
         $nmake_num = (nmake /?).Split([Environment]::NewLine) | Select -First 1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
 
         #Write-Output $nmake_num
-        Write-Output (((nmake /?) -split [Environment]::NewLine)[0] -split "Environment]::NewLine)[0]
+        Write-Output (((nmake /?) -split [Environment]::NewLine)[0] -split [Environment]::NewLine)
         
 
         exit 1
