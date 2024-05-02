@@ -313,22 +313,27 @@ jobs:
       with:
         arch: ${{ matrix.arch }}
 
-    - name: (cache) Lookup SciLex files
+    - name: (cache) Prepare cache info
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
-      uses: actions/cache/restore@v4
-      id: cache-lookup
-      with:
-        path: |
-          lexilla\bin
-          lexilla\src
-          scintilla\bin
-          scintilla\win32
-        key: cmake
-        lookup-only: true
+      id: cmake
+      run: |
+        Write-Output (nmake --version)
+        #$gcc_num = (gcc --version) | select-object -first 1 | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
+        #$make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
+        #$hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla', 'PowerEditor\gcc') }}"
+        #$key = "${{ runner.os }}-SCILEX-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-HASH_$hash"
+      
+        #Write-Output $gcc_num
+        #Write-Output $make_num
+        #Write-Output $hash
+        #Write-Output $key
+  
+        #Write-Output "key=$key" >> $env:GITHUB_OUTPUT
 
     - name: (cache) Restore SciLex files
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
       uses: actions/cache/restore@v4
+      id: cache-restore
       with:
         path: |
           lexilla\bin
@@ -344,7 +349,7 @@ jobs:
            #Write-Output (pwd).path
            #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
 
-            if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-lookup.outputs.cache-hit == 'true' }}) {
+            if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
               $Now = Get-Date
               Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
               Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
@@ -405,7 +410,7 @@ jobs:
            #$newContent | Set-Content -Path 'lexilla.mak'
 
            
-            if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-lookup.outputs.cache-hit == 'true' }}) {
+            if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
               $Now = Get-Date
               Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
               Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
@@ -429,7 +434,7 @@ jobs:
             #exit 1
 
     - name: (cache) Save SciLex files
-      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-restore.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
       with:
         path: |
