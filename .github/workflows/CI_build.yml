@@ -317,8 +317,7 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
       id: cmake
       run: |
-        $nmake_num = ((((cmd.exe /c "nmake /?") | Out-String) -split 'Version')[0])
-
+        $nmake_num = (((cmd.exe /c "nmake /?") -split 'Version')[0])
 
 
         Write-Output $nmake_num
