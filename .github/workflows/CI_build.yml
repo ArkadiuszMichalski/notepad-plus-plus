@@ -318,7 +318,7 @@ jobs:
       id: cmake
       run: |
         #((nmake /?) ((nmake /?) 2>&1 | Out-String)
-        $nmake_num = ((nmake /?) ((nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
+        $nmake_num = (nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
 
         Write-Output $nmake_num
         #Write-Output ((((nmake /?) | Out-String) -split '[\r\n]+')[0] | Select-String -Pattern 'Version (.*)Copyright' | %{$_.Matches.Groups[1].value})
