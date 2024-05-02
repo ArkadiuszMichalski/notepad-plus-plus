@@ -551,7 +551,7 @@ jobs:
           (Get-ChildItem PowerEditor\gcc\bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a).LastWriteTime = $Now
   
         }
-        #mingw32-make -f PowerEditor\gcc\makefile
+        mingw32-make -f PowerEditor\gcc\makefile
         
         #$Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
         #Write-Output (ccache -s -v -v)
