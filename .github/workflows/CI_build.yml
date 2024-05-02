@@ -347,7 +347,7 @@ jobs:
             if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-lookup.outputs.cache-hit == 'true' }}) {
               $Now = Get-Date
               Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-              Get-ChildItem -Path scintilla\win32 -File | ForEach-Object { $_.LastWriteTime = $Now }
+              Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
             }
 
            nmake -f scintilla.mak
@@ -407,8 +407,8 @@ jobs:
            
             if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-lookup.outputs.cache-hit == 'true' }}) {
               $Now = Get-Date
-              Get-ChildItem -Path lexilla\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-              Get-ChildItem -Path lexilla\src -File | ForEach-Object { $_.LastWriteTime = $Now }
+              Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
+              Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
             }
             
            nmake -f lexilla.mak
