@@ -16,7 +16,7 @@ jobs:
       matrix: ${{ steps.filter.outputs.matrix }}
       title: ${{ steps.filter.outputs.title }}
       python: ${{ steps.filter.outputs.python }}
-  
+   
     steps: 
     - name: Checkout repo
       uses: actions/checkout@v4
