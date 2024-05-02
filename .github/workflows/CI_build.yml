@@ -537,7 +537,8 @@ jobs:
         Write-Output (((gcc --version) | select-object -first 1) + " " + (gcc -dumpmachine))
         Write-Output (mingw32-make --version) | select-object -first 1
         Write-Output (sh --version) | select-object -first 1
-        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and (Test-Path -Path D:\.cache\ccache)) {
+        #if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and (Test-Path -Path D:\.cache\ccache)) {
+        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-lookup.outputs.cache-hit == 'true' }}) {
           
           #Write-Output (ccache --version) | select-object -first 1
           #$content = Get-Content -Path 'PowerEditor\gcc\makefile'
