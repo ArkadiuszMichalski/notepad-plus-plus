@@ -498,7 +498,7 @@ jobs:
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
 
-    - name: (cache) Prepare build directory
+    - name: (cache) Create build directory and all subdirectories
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
       run: |
        Add-Content -Path 'PowerEditor\gcc\makefile' -Value 'BUILD_DIRECTORY : $(BUILD_DIRECTORY)'
@@ -532,10 +532,15 @@ jobs:
           (Get-ChildItem bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a).LastWriteTime = $Now
         }
         mingw32-make -f PowerEditor\gcc\makefile
+        
+        
+        
+        
+        
+        
+        
         #Write-Output (Get-ChildItem -Path D:\ -Recurse -Directory -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-
-
-
+        
         
         #$Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
         #Write-Output (ccache -s -v -v)
