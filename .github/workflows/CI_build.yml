@@ -407,7 +407,7 @@ jobs:
               $Now = Get-Date
               Get-ChildItem -Path lexilla\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
             }
-           DIR_O = "..\bin"
+           $Env:DIR_O = "..\bin"
            nmake -f lexilla.mak
            Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
            
