@@ -336,7 +336,7 @@ jobs:
           scintilla\bin
           scintilla\win32
         key: cmake
- 
+  
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
