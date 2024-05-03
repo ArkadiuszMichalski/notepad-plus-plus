@@ -470,10 +470,6 @@ jobs:
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
 
-    - name: (cache) Create build directory and all subdirectories
-      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
-      run: |
-       mingw32-make -f PowerEditor\gcc\makefile bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
 
     - name: (cache) Restore SciLex files
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
@@ -485,6 +481,12 @@ jobs:
           bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
           bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a
         key: ${{ steps.msys2.outputs.key }}
+
+    - name: (cache) Create build directory and all subdirectories
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
+      run: |
+       mingw32-make -f PowerEditor\gcc\makefile bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
+
  
     - name: Make n++ exe
       working-directory: .\
