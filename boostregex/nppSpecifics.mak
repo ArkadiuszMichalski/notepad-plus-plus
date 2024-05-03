@@ -1,4 +1,4 @@
-## This makefile should be included in the main scintilla.mak file,
+# This makefile should be included in the main scintilla.mak file,
 # just after where LOBJS is defined (around line 
 # 
 # The following line should be added around line 211 of scintilla.mak
