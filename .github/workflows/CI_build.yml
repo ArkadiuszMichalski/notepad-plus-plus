@@ -287,7 +287,7 @@ jobs:
  
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == '' && 1
+    if: needs.before_build.outputs.result == '' && 0
     strategy:
       matrix:
         include:
@@ -403,7 +403,7 @@ jobs:
 
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == '' && 0
+    if: needs.before_build.outputs.result == '' && 1
     strategy:
       fail-fast: false
       #build_platform: [x86_64, i686]
@@ -473,8 +473,8 @@ jobs:
     - name: (cache) Create build directory and all subdirectories
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
       run: |
-       Add-Content -Path 'PowerEditor\gcc\makefile' -Value 'BUILD_DIRECTORY : $(BUILD_DIRECTORY)'
-       mingw32-make -f PowerEditor\gcc\makefile BUILD_DIRECTORY
+       #Add-Content -Path 'PowerEditor\gcc\makefile' -Value 'BUILD_DIRECTORY : $(BUILD_DIRECTORY)'
+       mingw32-make -f PowerEditor\gcc\makefile bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
 
     - name: (cache) Restore SciLex files
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
