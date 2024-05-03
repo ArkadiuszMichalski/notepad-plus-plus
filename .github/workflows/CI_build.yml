@@ -323,7 +323,7 @@ jobs:
         }
         else { 
           $cl_num = (cl /?) 2>&1 | Select-String -Pattern 'Version (.*) for' | %{$_.Matches.Groups[1].value}
-          $rc_num = (rc /?) 2>&1 | Out-String | Select -First 1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
+          $rc_num = ((rc /?) 2>&1 | Out-String).Trim() | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
           $nmake_num = (nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
           $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
           $key = "${{ runner.os }}-SCILEX-CMAKE-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-CL_$cl_num-RC_$rc_num-NMAKE_$nmake_num-HASH_$hash"
