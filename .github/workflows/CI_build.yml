@@ -343,10 +343,9 @@ jobs:
       uses: actions/cache/restore@v4
       id: cache-restore
       with:
+        #lexilla\bin scintilla\bin
         path: |
-          lexilla\bin
-          lexilla\src
-          scintilla\bin
+          lexilla\src  
           scintilla\win32
         key: ${{ steps.cmake.outputs.key }} 
    
