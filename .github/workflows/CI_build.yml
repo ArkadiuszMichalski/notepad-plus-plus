@@ -349,7 +349,7 @@ jobs:
           scintilla\bin
           scintilla\win32
         key: ${{ steps.cmake.outputs.key }} 
-  
+   
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
