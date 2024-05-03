@@ -335,7 +335,7 @@ jobs:
           Write-Output $key
 
           Write-Output "key=$key" >> $env:GITHUB_OUTPUT
-          exit 1
+          #exit 1
         }
 
     - name: (cache) Restore SciLex files
