@@ -287,7 +287,7 @@ jobs:
  
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == '' && 0
+    if: needs.before_build.outputs.result == '' && 1
     strategy:
       matrix:
         include:
@@ -403,7 +403,7 @@ jobs:
 
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == '' && 1
+    if: needs.before_build.outputs.result == '' && 0
     strategy:
       fail-fast: false
       #build_platform: [x86_64, i686]
