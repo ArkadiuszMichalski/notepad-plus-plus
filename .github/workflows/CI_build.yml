@@ -473,7 +473,6 @@ jobs:
     - name: (cache) Create build directory and all subdirectories
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
       run: |
-       #Add-Content -Path 'PowerEditor\gcc\makefile' -Value 'BUILD_DIRECTORY : $(BUILD_DIRECTORY)'
        mingw32-make -f PowerEditor\gcc\makefile bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
 
     - name: (cache) Restore SciLex files
