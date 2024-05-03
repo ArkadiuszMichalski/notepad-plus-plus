@@ -351,7 +351,7 @@ jobs:
         key: ${{ steps.cmake.outputs.key }} 
    
     - name: build scintilla
-      working-directory: scintilla/bin/
+      working-directory: scintilla/win32/
       run: |
         #$Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
         #Write-Output (pwd).path
@@ -361,7 +361,7 @@ jobs:
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
           Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
         }
-        nmake -f ../win32/scintilla.mak
+        nmake -f scintilla.mak
         Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         exit 1
 
