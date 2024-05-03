@@ -333,6 +333,8 @@ jobs:
           Write-Output $nmake_num
           Write-Output $hash
           Write-Output $key
+
+          Write-Output (rc /?)
     
           Write-Output "key=$key" >> $env:GITHUB_OUTPUT
           exit 1
