@@ -410,6 +410,12 @@ jobs:
       matrix:
         build_configuration: [Release, Debug]
         build_platform: [x86_64]
+    env:
+      PATH_FOR_CACHE: |
+        bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
+        bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
+        bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
+        bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a   
 
     steps:
     - name: Checkout repo
@@ -462,11 +468,7 @@ jobs:
       uses: actions/cache/restore@v4
       id: cache-lookup
       with:
-        path: |
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a     
+        path: env.PATH_FOR_CACHE    
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
   
@@ -479,11 +481,7 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
       uses: actions/cache/restore@v4
       with:
-        path: |
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a
+        path: env.PATH_FOR_CACHE 
         key: ${{ steps.msys2.outputs.key }}
 
     - name: Make n++ exe
@@ -553,9 +551,5 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
       with:
-        path: |
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
-          bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a
+        path: env.PATH_FOR_CACHE 
         key: ${{ steps.msys2.outputs.key }}
