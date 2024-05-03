@@ -468,7 +468,8 @@ jobs:
       uses: actions/cache/restore@v4
       id: cache-lookup
       with:
-        path: ${{ env.PATH_FOR_CACHE }}  
+        path: |
+          ${{ env.PATH_FOR_CACHE }}  
         key: ${{ steps.msys2.outputs.key }}   
         lookup-only: true
   
@@ -481,7 +482,8 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
       uses: actions/cache/restore@v4
       with:
-        path: ${{ env.PATH_FOR_CACHE }}  
+        path: |
+          ${{ env.PATH_FOR_CACHE }}  
         key: ${{ steps.msys2.outputs.key }}
 
     - name: Make n++ exe
@@ -551,5 +553,6 @@ jobs:
       if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
       with:
-        path: ${{ env.PATH_FOR_CACHE }}  
+        path: | 
+          ${{ env.PATH_FOR_CACHE }}  
         key: ${{ steps.msys2.outputs.key }}
