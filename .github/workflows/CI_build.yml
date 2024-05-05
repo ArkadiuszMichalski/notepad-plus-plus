@@ -364,7 +364,7 @@ jobs:
         nmake -E -f scintilla.mak DIR_O=..\bin\
         Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-        #exit 1
+        exit 1
 
     - name: build lexilla
       working-directory: lexilla/src/
