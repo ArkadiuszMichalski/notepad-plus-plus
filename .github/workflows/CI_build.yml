@@ -42,7 +42,7 @@ jobs:
         Write-Output (git log -1 --no-merges --pretty=%B)
         Write-Output '######'
         Write-Output (git log -1 --pretty=%B)
-  
+    
         Exit 1
 
         $commit_title = ($commit_message -split "[\r\n]+")[0]
