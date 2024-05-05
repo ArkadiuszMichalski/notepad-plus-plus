@@ -353,7 +353,7 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-        #$Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
+        $Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
         #Write-Output (pwd).path
         #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
         if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
