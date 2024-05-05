@@ -41,7 +41,7 @@ jobs:
 
         Write-Output (git log -1 --no-merges --pretty=%B)
         Write-Output '######'
-        Write-Output (git show -1 --no-merges --format=%B)
+        Write-Output (git log -1 --pretty=%B)
   
         Exit 1
 
