@@ -360,11 +360,8 @@ jobs:
           $Now = Get-Date
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
           #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
-          nmake -E -f scintilla.mak DIR_O='..\bin'
         }
-        else {
-          nmake -f scintilla.mak
-        }
+        nmake -E -f scintilla.mak DIR_O='..\bin'
         Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         #exit 1
@@ -375,12 +372,9 @@ jobs:
         if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
           $Now = Get-Date
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-          #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
-          nmake -E -f lexilla.mak DIR_O='..\bin'
+          #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }     
         }
-        else {
-          nmake -f lexilla.mak    
-        }
+        nmake -E -f lexilla.mak DIR_O='..\bin'
         Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         #exit 1
