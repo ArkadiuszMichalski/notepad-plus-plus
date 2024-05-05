@@ -294,6 +294,10 @@ jobs:
           - build_configuration: Release
             build_platform: x64
             arch: amd64
+    env:
+      PATH_FOR_CACHE: |
+        lexilla\bin
+        scintilla\bin
 
     steps:
     - name: Checkout repo
@@ -343,11 +347,7 @@ jobs:
       uses: actions/cache/restore@v4
       id: cache-restore
       with:
-        path: |
-          lexilla\bin
-          lexilla\src
-          scintilla\bin
-          scintilla\win32
+        path: ${{ env.PATH_FOR_CACHE }}
         key: ${{ steps.cmake.outputs.key }} 
    
     - name: build scintilla
@@ -357,34 +357,34 @@ jobs:
         #Write-Output (pwd).path
         #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
         if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
+          $Env:DIR_O = '..\bin'
           $Now = Get-Date
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-          Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
+          #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
         }
         nmake -f scintilla.mak
-        #Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         #exit 1
 
     - name: build lexilla
       working-directory: lexilla/src/
       run: |  
         if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
+          $Env:DIR_O = '..\bin'
           $Now = Get-Date
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-          Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
+          #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
         }
         nmake -f lexilla.mak    
-        #Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output (Get-ChildItem -Path ..\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        exit 1
            
     - name: (cache) Save SciLex files
       if: env.SCILEX_CMAKE_ALLOW_CACHE == 'true' && steps.cache-restore.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
       with:
-        path: |
-          lexilla\bin
-          lexilla\src
-          scintilla\bin
-          scintilla\win32
+        path: ${{ env.PATH_FOR_CACHE }}
         key: ${{ steps.cmake.outputs.key }} 
       
     - name: generate cmake
