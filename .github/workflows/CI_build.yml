@@ -39,9 +39,9 @@ jobs:
           $commit_message = $last_commit.commit.message
         }
 
-        Write (git log -1 --no-merges --pretty=%B)
-
-        Write (git show -s --no-merges --format=%B)
+        Write-Output (git log -1 --no-merges --pretty=%B)
+        Write-Output '######'
+        Write-Output (git show -s --no-merges --format=%B)
 
         Exit 1
 
