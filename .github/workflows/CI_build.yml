@@ -39,6 +39,12 @@ jobs:
           $commit_message = $last_commit.commit.message
         }
 
+        Write-Output (git log -1 --no-merges --pretty=%B)
+        Write-Output '######'
+        Write-Output (git log -1 --pretty=%B)
+    
+        Exit 1
+
         $commit_title = ($commit_message -split "[\r\n]+")[0]
         $files_modified = @(git diff --name-only HEAD~1)
         $files_needwork_all = @($files_modified | Where-Object {$_ -notmatch "\.(xml|$files_nowork)$|$folders_nowork|$folders_onejob" -or $_ -match "($files_needwork)$"})
