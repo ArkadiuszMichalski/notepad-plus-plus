@@ -360,7 +360,7 @@ jobs:
           $Now = Get-Date
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
           #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
-          nmake -E -f scintilla.mak DIR_O='..\bin'
+          nmake -E -f scintilla.mak DIR_O='..\\bin'
         }
         else {
           nmake -f scintilla.mak
@@ -376,7 +376,7 @@ jobs:
           $Now = Get-Date
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
           #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
-          nmake -E -f lexilla.mak DIR_O='..\bin'
+          nmake -E -f lexilla.mak DIR_O='..\\bin'
         }
         else {
           nmake -f lexilla.mak    
