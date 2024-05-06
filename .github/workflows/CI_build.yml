@@ -43,7 +43,11 @@ jobs:
         Write-Output '######'
         Write-Output (git log -1 --pretty=%B)
         Write-Output '######'
-        Write-Output (git log --pretty=%B)
+        Write-Output (git log --no-merges --pretty=%B)
+
+        $commit_message = $isPush ? (git show -s --format=%B) : (git log -1 --no-merges --pretty=%B)
+        Write-Output '######2'
+        Write-Output $commit_message
     
         Exit 1
 
