@@ -50,7 +50,7 @@ jobs:
         Write-Output $commit_message
         Write-Output $commit_title
         Exit 1
-
+ 
         if ($allowMaster -or !$isMaster) {
             if ($commit_title -match "\[force all\]") {
               Write-Output "Run standard jobs"
