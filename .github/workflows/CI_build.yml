@@ -38,22 +38,18 @@ jobs:
           $last_commit = @(Invoke-RestMethod ${{ github.event.pull_request._links.commits.href }})[0] | Select-Object -Last 1
           $commit_message = $last_commit.commit.message
         }
-        Write-Output ${{ github.event.pull_request._links.commits.href }}
-        Write-Output (git log -1 --no-merges --pretty=%B)
-        Write-Output '######'
-        Write-Output (git log -1 --pretty=%B)
-        Write-Output '######'
-        Write-Output (git log --no-merges --pretty=%B)
-
         $commit_message = $isPush ? (git show -s --format=%B) : (git log -1 --no-merges --pretty=%B)
         Write-Output '######2'
         Write-Output $commit_message
-    
         Exit 1
 
         $commit_title = ($commit_message -split "[\r\n]+")[0]
         $files_modified = @(git diff --name-only HEAD~1)
         $files_needwork_all = @($files_modified | Where-Object {$_ -notmatch "\.(xml|$files_nowork)$|$folders_nowork|$folders_onejob" -or $_ -match "($files_needwork)$"})
+
+        Write-Output $commit_message
+        Write-Output $commit_title
+        Exit 1
 
         if ($allowMaster -or !$isMaster) {
             if ($commit_title -match "\[force all\]") {
