@@ -361,7 +361,7 @@ jobs:
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
           #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
         }
-        nmake -E -f ..\..\boostregex\nppSpecifics.mak -f scintilla.mak DIR_O=..\bin
+        nmake -E -f scintilla.mak -f ..\..\boostregex\nppSpecifics.mak DIR_O=..\bin
         Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         exit 1
