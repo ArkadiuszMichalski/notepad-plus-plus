@@ -112,7 +112,7 @@ SRC_OBJS=\
 
 
 # To have PCRE boost regex with header only is integrated and not just the one from std
-!INCLUDE ../../boostregex/nppSpecifics.mak
+#!INCLUDE ../../boostregex/nppSpecifics.mak
 
 COMPONENT_OBJS = \
 	$(DIR_O)\HanjaDic.obj \
