@@ -1,21 +1,24 @@
 name: CI_build
-
+        
 on: [push, pull_request]
 env:
   PYTHON_ALLOW_CACHE: true
   PYTHON_DIR_CACHE: D:\.cache\python
-
-jobs:
-  before_build:
-
+  SCILEX_CMAKE_ALLOW_CACHE: true
+  SCILEX_MSYS2_ALLOW_CACHE: true
+  MSYS2_ALLOW_UPDATE: true 
+       
+jobs: 
+  before_build: 
+  
     runs-on: windows-latest
     outputs:
       result: ${{ steps.filter.outputs.result }}
       matrix: ${{ steps.filter.outputs.matrix }}
       title: ${{ steps.filter.outputs.title }}
       python: ${{ steps.filter.outputs.python }}
-
-    steps:
+   
+    steps: 
     - name: Checkout repo
       uses: actions/checkout@v4
       with:
@@ -29,7 +32,7 @@ jobs:
         $folders_nowork = "\.github/ISSUE_TEMPLATE"
         $files_nowork = "md|txt|log|ini"
         $files_needwork = "CMakeLists\.txt"
-
+ 
         $matrix_all = 'matrix={"build_configuration": ["Release", "Debug"], "build_platform": ["x64", "Win32", "ARM64"]}'
         $matrix_onejob = 'matrix={"build_configuration": ["Debug"], "build_platform": ["Win32"]}'
         Write-Output $matrix_all >> $env:GITHUB_OUTPUT
@@ -37,7 +40,14 @@ jobs:
         $isPush = "${{github.event_name }}" -eq "push" ? $true : $false
         $isMaster = $isPush -and $${{ github.ref_name == github.event.repository.master_branch }}
 
-        $commit_message = $isPush ? (git show -s --format=%B) : (git log -1 --no-merges --pretty=%B)
+        if ($isPush) {
+          $commit_message = (git show -s --format=%B)
+        }
+        else {
+          $last_commit = @(Invoke-RestMethod ${{ github.event.pull_request._links.commits.href }})[0] | Select-Object -Last 1
+          $commit_message = $last_commit.commit.message
+        }
+
         $commit_title = ($commit_message -split "[\r\n]+")[0]
         Write-Output "title=$commit_title" >> $env:GITHUB_OUTPUT
         $files_modified = @(git diff --name-only HEAD~1)
@@ -57,7 +67,7 @@ jobs:
                     Write-Output "Changed files on this commit don't require any additional tasks.`n"
                     Write-Output "result=OK" >> $env:GITHUB_OUTPUT
                     Write-Output "PYTHON_ALLOW_CACHE=false" >> $env:GITHUB_ENV
-                    Exit
+                    Exit 
                 }
                 else {
                     Write-Output "Run only XML validation step"
@@ -100,27 +110,27 @@ jobs:
       id: cache-lookup
       with:
         path: ${{ env.PYTHON_DIR_CACHE }}
-        key: ${{ steps.filter.outputs.python }}
+        key: ${{ steps.filter.outputs.python }}   
         lookup-only: true
-
+        
     - name: (cache) Restore Python modules
       if: env.PYTHON_ALLOW_CACHE == 'true' && steps.filter.outputs.result == 'XML' && steps.cache-lookup.outputs.cache-hit == 'true'
       uses: actions/cache/restore@v4
       with:
         path: ${{ env.PYTHON_DIR_CACHE }}
-        key: ${{ steps.filter.outputs.python }}
-
+        key: ${{ steps.filter.outputs.python }}   
+  
     - name: (cache) Install Python modules
       if: env.PYTHON_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true'
       run: |
         python -m pip install --target ${{ env.PYTHON_DIR_CACHE }} requests rfc3987 pywin32 lxml
-
+        
     - name: (cache) Save Python modules
       if: env.PYTHON_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
       with:
         path: ${{ env.PYTHON_DIR_CACHE }}
-        key: ${{ steps.filter.outputs.python }}
+        key: ${{ steps.filter.outputs.python }} 
 
     - name: XML validation
       if: steps.filter.outputs.result == 'XML'
@@ -145,7 +155,7 @@ jobs:
 
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == '' || needs.before_build.outputs.result == 'ONEJOB'
+    if: (needs.before_build.outputs.result == '' || needs.before_build.outputs.result == 'ONEJOB') && 0
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.before_build.outputs.matrix) }}
@@ -203,12 +213,12 @@ jobs:
           name: Notepad++.MSVC.${{ matrix.build_platform}}.${{ matrix.build_configuration}}
           path: PowerEditor\visual.net\${{ matrix.build_configuration}}\Notepad++.exe
 
-    - name: (cache) Restore Python modules for Win32 / Debug
+    - name: (cache) Restore Python modules for Win32 / Debug 
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug' && env.PYTHON_ALLOW_CACHE == 'true' && contains(needs.before_build.outputs.title, '[force nopythoncache]') != true
       uses: actions/cache/restore@v4
       with:
         path: ${{ env.PYTHON_DIR_CACHE }}
-        key: ${{ needs.before_build.outputs.python }}
+        key: ${{ needs.before_build.outputs.python }}  
 
     - name: Run xml validation test for Win32 / Debug only
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug'
@@ -221,8 +231,7 @@ jobs:
              python -m pip install requests rfc3987 pywin32 lxml
            }
            python PowerEditor\Test\xmlValidator\validator_xml.py
-
-
+ 
     - name: Run FunctionList and UrlDetection Tests for Win32 / Debug only
       if: matrix.build_platform == 'Win32' && matrix.build_configuration == 'Debug'
       working-directory: .\
@@ -273,18 +282,22 @@ jobs:
       # working-directory: PowerEditor\visual.net\
       # run: msbuild notepadPlus.sln /m /p:configuration="${{ matrix.build_configuration }}" /p:platform="${{ matrix.build_platform }}" /p:PlatformToolset="ClangCL"
 
-
-  build_windows_cmake:
-
+ 
+  build_windows_cmake: 
+ 
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == ''
+    if: needs.before_build.outputs.result == '' && 1
     strategy:
       matrix:
         include:
           - build_configuration: Release
             build_platform: x64
             arch: amd64
+    env:
+      PATH_FOR_CACHE: |
+        lexilla\bin
+        scintilla\bin
 
     steps:
     - name: Checkout repo
@@ -305,19 +318,77 @@ jobs:
       with:
         arch: ${{ matrix.arch }}
 
+    - name: (cache) Prepare cache info
+      if: env.SCILEX_CMAKE_ALLOW_CACHE == 'true'
+      id: cmake
+      run: |
+        if ($${{ contains(needs.before_build.outputs.title, '[force noscilexcache]') }}) {
+          Write-Output "SCILEX_CMAKE_ALLOW_CACHE=false" >> $env:GITHUB_ENV
+        }
+        else { 
+          $cl_num = (cl /?) 2>&1 | Select-String -Pattern 'Version (.*) for' | %{$_.Matches.Groups[1].value}
+          $rc_num = (((rc /?) 2>&1) -split '[\r\n]+')[1] | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
+          $nmake_num = (nmake /?) 2>&1 | Select-String -Pattern 'Version (.*)' | %{$_.Matches.Groups[1].value}
+          $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla') }}"
+          $key = "${{ runner.os }}-SCILEX-CMAKE-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-CL_$cl_num-RC_$rc_num-NMAKE_$nmake_num-HASH_$hash"
+        
+          Write-Output $cl_num
+          Write-Output $rc_num
+          Write-Output $nmake_num
+          Write-Output $hash
+          Write-Output $key
+
+          Write-Output "key=$key" >> $env:GITHUB_OUTPUT
+          #exit 1
+        }
+
+    - name: (cache) Restore SciLex files
+      if: env.SCILEX_CMAKE_ALLOW_CACHE == 'true'
+      uses: actions/cache/restore@v4
+      id: cache-restore
+      with:
+        path: ${{ env.PATH_FOR_CACHE }}
+        key: ${{ steps.cmake.outputs.key }} 
+   
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-           nmake -f scintilla.mak
+        #$Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
+        #Write-Output (pwd).path
+        #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
+        if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
+          $Now = Get-Date
+          Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
+          #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
+        }
+        nmake -E -f scintilla.mak DIR_O=..\bin
+        Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        exit 1
 
     - name: build lexilla
       working-directory: lexilla/src/
-      run: |
-           nmake -f lexilla.mak
-
+      run: |  
+        if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
+          $Now = Get-Date
+          Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
+          #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }     
+        }
+        nmake -E -f lexilla.mak DIR_O=..\bin
+        Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        #exit 1
+           
+    - name: (cache) Save SciLex files
+      if: env.SCILEX_CMAKE_ALLOW_CACHE == 'true' && steps.cache-restore.outputs.cache-hit != 'true' && github.event_name == 'push'
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ env.PATH_FOR_CACHE }}
+        key: ${{ steps.cmake.outputs.key }} 
+      
     - name: generate cmake
       working-directory: PowerEditor/src
-      run: |
+      run: | 
            mkdir _build
            cd _build
            cmake -G "Visual Studio 17 2022" -A ${{ matrix.build_platform }} -T "v143" ..
@@ -332,12 +403,19 @@ jobs:
 
     runs-on: windows-latest
     needs: before_build
-    if: needs.before_build.outputs.result == ''
+    if: needs.before_build.outputs.result == '' && 0
     strategy:
       fail-fast: false
+      #build_platform: [x86_64, i686]
       matrix:
         build_configuration: [Release, Debug]
-        build_platform: [x86_64, i686]
+        build_platform: [x86_64]
+    env:
+      PATH_FOR_CACHE: |
+        bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build
+        bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build
+        bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a
+        bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a   
 
     steps:
     - name: Checkout repo
@@ -350,28 +428,111 @@ jobs:
            $content = Get-Content -Path 'resource.h'
            $newContent = $content -replace 'TEXT\(\"Notepad\+\+ v.*\"\)', 'TEXT("Notepad++ GH_BUILD")'
            $newContent | Set-Content -Path 'resource.h'
+ 
+    - name: Setup MSYS2 and prepare cache info
+      id: msys2
+      run: |   
+        $Env:Path = 'C:\msys64\usr\bin' + [IO.Path]::PathSeparator + $Env:Path
+        if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:MSYSTEM = 'MINGW32'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
+        if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:Path = 'C:\msys64\mingw32\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
+        if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:MSYSTEM = 'MINGW64'; Write-Output "MSYSTEM=$Env:MSYSTEM" >> $env:GITHUB_ENV}
+        if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:Path = 'C:\msys64\mingw64\bin' + [IO.Path]::PathSeparator + $Env:Path; Write-Output "Path=$Env:Path" >> $env:GITHUB_ENV}
+        if ( $${{ matrix.build_configuration == 'Debug'}} ) {$Env:DEBUG = '1'; Write-Output "DEBUG=$Env:DEBUG" >> $env:GITHUB_ENV}
+        if ($Env:MSYS2_ALLOW_UPDATE -eq "true") {
+          Write-Output "Update MSYS2 and GCC and MAKE"
+          bash -lc "pacman --noconfirm -Syuu"
+          bash -lc "pacman --noconfirm -Syuu"
+          if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make"}
+          if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make"}
+        }
+        if ($${{ contains(needs.before_build.outputs.title, '[force noscilexcache]') }}) {
+          $env:SCILEX_MSYS2_ALLOW_CACHE = "false"
+          Write-Output "SCILEX_MSYS2_ALLOW_CACHE=false" >> $env:GITHUB_ENV
+        }
+        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true") { 
+          $gcc_num = (gcc --version) | select-object -first 1 | Select-String -Pattern '\) (.*)' | %{$_.Matches.Groups[1].value}
+          $make_num = (mingw32-make --version) | select-object -first 1 | Select-String -Pattern 'e (.*)' | %{$_.Matches.Groups[1].value}
+          $hash = "${{ hashFiles('boostregex', 'lexilla', 'scintilla', 'PowerEditor\gcc') }}"
+          $key = "${{ runner.os }}-SCILEX-MSYS2-${{ matrix.build_platform }}-${{ matrix.build_configuration }}-GCC_$gcc_num-MAKE_$make_num-HASH_$hash"
+        
+          Write-Output $gcc_num
+          Write-Output $make_num
+          Write-Output $hash
+          Write-Output $key
+  
+          Write-Output "key=$key" >> $env:GITHUB_OUTPUT
+        }
+     
+    - name: (cache) Lookup SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true'
+      uses: actions/cache/restore@v4
+      id: cache-lookup
+      with:
+        path: ${{ env.PATH_FOR_CACHE }}  
+        key: ${{ steps.msys2.outputs.key }}   
+        lookup-only: true
+  
+    - name: (cache) Create build directory and all subdirectories
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
+      run: |
+       mingw32-make -f PowerEditor\gcc\makefile bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build
+
+    - name: (cache) Restore SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit == 'true'
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ env.PATH_FOR_CACHE }}  
+        key: ${{ steps.msys2.outputs.key }}
 
     - name: Make n++ exe
       working-directory: .\
       run: |
-        Write-host "${{ matrix.build_platform }}"
-        Write-host "${{ matrix.build_configuration }}"
-        $Env:Path = 'C:\msys64\usr\bin' + [IO.Path]::PathSeparator + $Env:Path
-        if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:MSYSTEM = 'MINGW32'}
-        if ( $${{ matrix.build_platform == 'i686'}} ) {$Env:Path = 'C:\msys64\mingw32\bin' + [IO.Path]::PathSeparator + $Env:Path}
-        if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:MSYSTEM = 'MINGW64'}
-        if ( $${{ matrix.build_platform == 'x86_64'}} ) {$Env:Path = 'C:\msys64\mingw64\bin' + [IO.Path]::PathSeparator + $Env:Path}
-        if ( $${{ matrix.build_configuration == 'Debug'}} ) {$Env:DEBUG = '1'}
-        bash -lc "pacman --noconfirm -Syuu"
-        bash -lc "pacman --noconfirm -Syuu"
-        if ( $${{ matrix.build_platform == 'i686'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-i686-gcc mingw-w64-i686-make"}
-        if ( $${{ matrix.build_platform == 'x86_64'}} ) {bash -lc "pacman --noconfirm -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make"}
+        Write-Output "${{ matrix.build_platform }}"
+        Write-Output "${{ matrix.build_configuration }}"
         Write-Output "Tools version:"
         Write-Output (((gcc --version) | select-object -first 1) + " " + (gcc -dumpmachine))
         Write-Output (mingw32-make --version) | select-object -first 1
         Write-Output (sh --version) | select-object -first 1
+        if ($Env:SCILEX_MSYS2_ALLOW_CACHE -eq "true" -and $${{ steps.cache-lookup.outputs.cache-hit == 'true' }}) {
+          $Now = Get-Date; 
+          Get-ChildItem -Path bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_lexilla.build -File | ForEach-Object { $_.LastWriteTime = $Now }
+          Get-ChildItem -Path bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\_scintilla.build -File | ForEach-Object { $_.LastWriteTime = $Now }
+          (Get-ChildItem bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\liblexilla.a).LastWriteTime = $Now
+          (Get-ChildItem bin.${{ matrix.build_platform }}${{ matrix.build_configuration == 'Debug' && '-debug' || '' }}.build\libscintilla.a).LastWriteTime = $Now
+        }
         mingw32-make -f PowerEditor\gcc\makefile
+        
+        
+        
+        
+        
+        
+        
+        #Write-Output (Get-ChildItem -Path D:\ -Recurse -Directory -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        
+        
+        #$Env:CCACHE_DIR = "D:\.cache\ccache\scilex"
+        #Write-Output (ccache -s -v -v)
 
+        #$Env:CCACHE_DIR = "D:\.cache\ccache"
+        #$newContent = $content -replace 'DIR_O', 'CCACHE_DIR=D:\ccache\_SciLex DIR_O'
+        #Write-Output $newContent
+         
+        #mingw32-make -f PowerEditor\gcc\makefile CXX="ccache g++"
+   
+        if (0){
+        Write-Output (ccache -s)
+        Write-Output "========="
+        Write-Output (ccache -p)
+
+        Write-Output "========="
+        Write-Output (Get-ChildItem -Path D:\.cache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        Write-Output "========="
+        Write-Output (Get-ChildItem -Path C:\Users\runneradmin\AppData\Local\ccache -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+
+        #Write-Output (Get-ChildItem -Path D:\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        }
+ 
     - name: Archive artifacts for ${{ matrix.build_platform}} / Release
       if: matrix.build_configuration == 'Release'
       uses: actions/upload-artifact@v4
@@ -385,3 +546,10 @@ jobs:
       with:
           name: Notepad++.GCC.${{ matrix.build_platform}}.${{ matrix.build_configuration}}
           path: bin.${{ matrix.build_platform}}-debug\notepad++.exe
+
+    - name: (cache) Save SciLex files
+      if: env.SCILEX_MSYS2_ALLOW_CACHE == 'true' && steps.cache-lookup.outputs.cache-hit != 'true' && github.event_name == 'push'
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ env.PATH_FOR_CACHE }}  
+        key: ${{ steps.msys2.outputs.key }}
