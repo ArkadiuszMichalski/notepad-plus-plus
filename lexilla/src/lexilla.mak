@@ -239,8 +239,8 @@ $(LIBLEXILLA): $(LEXILLA_OBJS)
 {.}.cxx{$(DIR_O)}.obj::
 	$(CXX) $(CXXFLAGS) -c $(NAME)$(DIR_O)\ $<
 
-.rc.res:
-	$(RC) -fo$(DIR_O)\$@ $**
+$(DIR_O)\.rc.res:
+	$(RC) -fo$@ $**
 
 # Dependencies
 
