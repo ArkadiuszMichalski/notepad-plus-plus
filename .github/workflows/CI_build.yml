@@ -349,7 +349,7 @@ jobs:
       with:
         path: ${{ env.PATH_FOR_CACHE }}
         key: ${{ steps.cmake.outputs.key }} 
-   
+    
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
