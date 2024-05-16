@@ -359,9 +359,9 @@ jobs:
           $Now = Get-Date
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
         }
-        nmake -f scintilla.mak DIR_O=..\bin
-        Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-        Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        #nmake -f scintilla.mak DIR_O=..\bin
+        #Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
+        #Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         #exit 1
 
     - name: build lexilla
