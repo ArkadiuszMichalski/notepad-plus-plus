@@ -356,11 +356,8 @@ jobs:
         if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
           $Now = Get-Date
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-          nmake -f scintilla.mak DIR_O=..\bin
         }
-        else {
-          nmake -f scintilla.mak
-        }
+        nmake -f scintilla.mak DIR_O=..\bin
         Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
         exit 1
@@ -370,12 +367,9 @@ jobs:
       run: |  
         if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
           $Now = Get-Date
-          Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-          nmake -f lexilla.mak DIR_O=..\bin
+          Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }      
         }
-        else {
-          nmake -f lexilla.mak
-        }
+        nmake -f lexilla.mak DIR_O=..\bin
         
     - name: (cache) Save SciLex files
       if: env.SCILEX_CMAKE_ALLOW_CACHE == 'true' && steps.cache-restore.outputs.cache-hit != 'true' && github.event_name == 'push'
