@@ -353,18 +353,14 @@ jobs:
     - name: build scintilla
       working-directory: scintilla/win32/
       run: |
-        #$Env:DIR_O = 'D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
-        #Write-Output (pwd).path
-        #nmake -E -f scintilla.mak DIR_O='D:\a\notepad-plus-plus\notepad-plus-plus\scintilla\bin'
         if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
           $Now = Get-Date
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-          #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }
+          nmake -f scintilla.mak DIR_O=..\bin
         }
-        nmake -E -f scintilla.mak DIR_O=..\bin
-        Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-        Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-        exit 1
+        else {
+          nmake -f scintilla.mak
+        }
 
     - name: build lexilla
       working-directory: lexilla/src/
@@ -372,13 +368,12 @@ jobs:
         if ($Env:SCILEX_CMAKE_ALLOW_CACHE -eq "true" -and $${{ steps.cache-restore.outputs.cache-hit == 'true' }}) {
           $Now = Get-Date
           Get-ChildItem -Path ..\bin -File | ForEach-Object { $_.LastWriteTime = $Now }
-          #Get-ChildItem -Path .\ -File | ForEach-Object { $_.LastWriteTime = $Now }     
+          nmake -f lexilla.mak DIR_O=..\bin
         }
-        nmake -E -f lexilla.mak DIR_O=..\bin
-        Write-Output (Get-ChildItem -Path ..\bin -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-        Write-Output (Get-ChildItem -Path .\ -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object FullName)
-        #exit 1
-           
+        else {
+          nmake -f lexilla.mak
+        }
+        
     - name: (cache) Save SciLex files
       if: env.SCILEX_CMAKE_ALLOW_CACHE == 'true' && steps.cache-restore.outputs.cache-hit != 'true' && github.event_name == 'push'
       uses: actions/cache/save@v4
