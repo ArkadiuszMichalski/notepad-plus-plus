@@ -3218,7 +3218,7 @@ void scanToUrlEnd(const wchar_t *text, int textLen, int start, int* distance)
 {
 	int p = start;
 	wchar_t q = 0;
-	enum {sHostAndPath, sQuery, sQueryAfterDelimiter, sQueryQuotes, sQueryAfterQuotes, sFragment} s = sHostAndPath;
+	enum {sHostAndPath, sQuery, sQueryAfterDelimiter, sQueryQuotes, sQueryAfterQuotes, sFragment, sFragmentQuotes} s = sHostAndPath;
 	while (p < textLen)
 	{
 		switch (s)
@@ -3298,11 +3298,41 @@ void scanToUrlEnd(const wchar_t *text, int textLen, int start, int* distance)
 				break;
 
 			case sFragment:
-				if (text [p] != '?' && !isUrlTextChar(text [p]))
+				if ((text [p] == '\'') || (text [p] == '`'))
+				{
+					q = text [p];
+					s = sFragmentQuotes;
+				}
+				else if (text [p] == '(')
+				{
+					q = ')';
+					s = sFragmentQuotes;
+				}
+				else if (text [p] == '[')
+				{
+					q = ']';
+					s = sFragmentQuotes;
+				}
+				else if (text [p] == '{')
+				{
+					q = '}';
+					s = sFragmentQuotes;
+				}
+				else if (text [p] != '?' && !isUrlTextChar(text [p]))
 				{
 					*distance = p - start;
 					return;
 				}
+				break;
+
+			case sFragmentQuotes:
+				if (text [p] < ' ')
+				{
+					*distance = p - start;
+					return;
+				}
+				if (text [p] == q)
+					s = sFragment;
 				break;
 		}
 		p++;
