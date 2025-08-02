@@ -3214,10 +3214,11 @@ bool scanToUrlStart(wchar_t *text, int textLen, int start, int* distance, int* s
 // The query pattern going through looks like this:
 // - ?abc;def;fgh="i j k"&'l m n'+opq
 //
-void scanToUrlEnd(const wchar_t *text, int textLen, int start, int* distance)
+void scanToUrlEnd(const wchar_t *text, int textLen, int start, int* distance, int startUrl)
 {
 	int p = start;
 	wchar_t q = 0;
+	int qPos = -1;
 	enum {sHostAndPath, sQuery, sQueryAfterDelimiter, sQueryQuotes, sQueryAfterQuotes, sFragment, sFragmentQuotes} s = sHostAndPath;
 	while (p < textLen)
 	{
@@ -3298,28 +3299,34 @@ void scanToUrlEnd(const wchar_t *text, int textLen, int start, int* distance)
 				break;
 
 			case sFragment:
-				if ((text [p] == '\'') || (text [p] == '`'))
+				if ((text [p] == '\'') || (text [p] == '"') || (text [p] == '`'))
 				{
 					q = text [p];
+					//qPos = p;
 					s = sFragmentQuotes;
 				}
 				else if (text [p] == '(')
 				{
 					q = ')';
+					//qPos = p;
 					s = sFragmentQuotes;
 				}
 				else if (text [p] == '[')
 				{
 					q = ']';
+					//qPos = p;
 					s = sFragmentQuotes;
 				}
 				else if (text [p] == '{')
 				{
 					q = '}';
+					//qPos = p;
 					s = sFragmentQuotes;
 				}
 				else if (text [p] != '?' && !isUrlTextChar(text [p]))
 				{
+					//if (startUrl > 0 && text [startUrl - 1] == '"' && text [p - 1] == '"')
+						//p -= 1;
 					*distance = p - start;
 					return;
 				}
@@ -3328,15 +3335,28 @@ void scanToUrlEnd(const wchar_t *text, int textLen, int start, int* distance)
 			case sFragmentQuotes:
 				if (text [p] < ' ')
 				{
+					// To jest potrzebne jak mamy CRLF i nie zamknięty ogranicznik, tj. mamy "url # cos"        CRLF<< wtedy musi wrócić do tego ostatniego "
+					//if (text [startUrl - 1] == text [qPos]) // qPos > -1 && 
+						//p = qPos;
 					*distance = p - start;
 					return;
 				}
 				if (text [p] == q)
+				{
+					//qPos = -1;
 					s = sFragment;
+				}
 				break;
 		}
 		p++;
 	}
+/*
+	// To jest potrzebne dla ostatniej linii jak nie ma CRLF i nie zamknięty ogranicznik, tj. mamy "url # cos"        << to musi wrócić do tego ostatniego "
+	if (qPos > -1 && text [startUrl - 1] == text [qPos])
+		p = qPos;
+	// Korekta ostatniego " bo poniższa funkcja tego nie robi
+	else if (q != 0 && startUrl > 0 && text [startUrl - 1] == '"' && text [p - 1] == '"')
+		p -= 1;*/
 	*distance = p - start;
 }
 
@@ -3414,7 +3434,7 @@ bool isUrl(wchar_t * text, int textLen, int start, int* segmentLen)
 			return false;
 		}
 		int len = 0;
-		scanToUrlEnd (text, textLen, start + schemeLen, & len);
+		scanToUrlEnd (text, textLen, start + schemeLen, & len, start);
 		if (len)
 		{
 			len += schemeLen;
